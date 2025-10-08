@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-nft-collections
+      author: GisDuck
+      changes:
+        - createTable:
+            tableName: nft_collections
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: img_url
+                  type: varchar(1024)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+                  constraints:
+                    nullable: false

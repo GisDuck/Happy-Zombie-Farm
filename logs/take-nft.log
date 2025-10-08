@@ -1,0 +1,52 @@
+2025-10-08 19:30:36 [main] INFO  g.H.HappyZombieFarmApplication - Starting HappyZombieFarmApplication using Java 17.0.12 with PID 10476 (C:\Users\sigaj\IdeaProjects\Happy-Zombie-Farm\build\classes\java\main started by sigaj in C:\Users\sigaj\IdeaProjects\Happy-Zombie-Farm)
+2025-10-08 19:30:36 [main] INFO  g.H.HappyZombieFarmApplication - No active profile set, falling back to 1 default profile: "default"
+2025-10-08 19:30:37 [main] INFO  o.s.b.d.c.l.DockerComposeLifecycleManager - Using Docker Compose file C:\Users\sigaj\IdeaProjects\Happy-Zombie-Farm\compose.yaml
+2025-10-08 19:30:40 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Network happy-zombie-farm_default  Creating
+2025-10-08 19:30:40 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Network happy-zombie-farm_default  Created
+2025-10-08 19:30:40 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container happy-zombie-farm-pgadmin-1  Creating
+2025-10-08 19:30:40 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container happy-zombie-farm-db-1  Creating
+2025-10-08 19:30:40 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container happy-zombie-farm-db-1  Created
+2025-10-08 19:30:40 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container app  Creating
+2025-10-08 19:30:40 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container happy-zombie-farm-pgadmin-1  Created
+2025-10-08 19:30:40 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container app  Created
+2025-10-08 19:30:40 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container happy-zombie-farm-pgadmin-1  Starting
+2025-10-08 19:30:40 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container happy-zombie-farm-db-1  Starting
+2025-10-08 19:30:41 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container happy-zombie-farm-pgadmin-1  Started
+2025-10-08 19:30:41 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container happy-zombie-farm-db-1  Started
+2025-10-08 19:30:41 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container app  Starting
+2025-10-08 19:30:42 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container app  Started
+2025-10-08 19:30:42 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container app  Waiting
+2025-10-08 19:30:42 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container happy-zombie-farm-db-1  Waiting
+2025-10-08 19:30:42 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container happy-zombie-farm-pgadmin-1  Waiting
+2025-10-08 19:30:42 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container happy-zombie-farm-db-1  Healthy
+2025-10-08 19:30:42 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container happy-zombie-farm-pgadmin-1  Healthy
+2025-10-08 19:30:43 [OutputReader-stderr] INFO  o.s.b.docker.compose.core.DockerCli -  Container app  Healthy
+2025-10-08 19:32:45 [main] ERROR o.s.boot.SpringApplication - Application run failed
+org.springframework.boot.docker.compose.lifecycle.ReadinessTimeoutException: Readiness timeout of PT2M reached while waiting for services [happy-zombie-farm-pgadmin-1]
+	at org.springframework.boot.docker.compose.lifecycle.ServiceReadinessChecks.waitUntilReady(ServiceReadinessChecks.java:83)
+	at org.springframework.boot.docker.compose.lifecycle.DockerComposeLifecycleManager.start(DockerComposeLifecycleManager.java:145)
+	at org.springframework.boot.docker.compose.lifecycle.DockerComposeListener.onApplicationEvent(DockerComposeListener.java:53)
+	at org.springframework.boot.docker.compose.lifecycle.DockerComposeListener.onApplicationEvent(DockerComposeListener.java:35)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.doInvokeListener(SimpleApplicationEventMulticaster.java:185)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.invokeListener(SimpleApplicationEventMulticaster.java:178)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:156)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:138)
+	at org.springframework.boot.context.event.EventPublishingRunListener.multicastInitialEvent(EventPublishingRunListener.java:136)
+	at org.springframework.boot.context.event.EventPublishingRunListener.contextLoaded(EventPublishingRunListener.java:98)
+	at org.springframework.boot.SpringApplicationRunListeners.lambda$contextLoaded$4(SpringApplicationRunListeners.java:72)
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
+	at org.springframework.boot.SpringApplicationRunListeners.doWithListeners(SpringApplicationRunListeners.java:118)
+	at org.springframework.boot.SpringApplicationRunListeners.doWithListeners(SpringApplicationRunListeners.java:112)
+	at org.springframework.boot.SpringApplicationRunListeners.contextLoaded(SpringApplicationRunListeners.java:72)
+	at org.springframework.boot.SpringApplication.prepareContext(SpringApplication.java:416)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:317)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at game.Happy_Zombie_Farm.HappyZombieFarmApplication.main(HappyZombieFarmApplication.java:10)
+	Suppressed: org.springframework.boot.docker.compose.lifecycle.ServiceNotReadyException: Immediate disconnect while connecting to port 59862
+		at org.springframework.boot.docker.compose.lifecycle.TcpConnectServiceReadinessCheck.check(TcpConnectServiceReadinessCheck.java:71)
+		at org.springframework.boot.docker.compose.lifecycle.TcpConnectServiceReadinessCheck.check(TcpConnectServiceReadinessCheck.java:58)
+		at org.springframework.boot.docker.compose.lifecycle.TcpConnectServiceReadinessCheck.check(TcpConnectServiceReadinessCheck.java:48)
+		at org.springframework.boot.docker.compose.lifecycle.ServiceReadinessChecks.check(ServiceReadinessChecks.java:97)
+		at org.springframework.boot.docker.compose.lifecycle.ServiceReadinessChecks.waitUntilReady(ServiceReadinessChecks.java:77)
+		... 19 common frames omitted
