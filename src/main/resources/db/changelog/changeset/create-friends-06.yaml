@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-friends-table
+      author: GisDuck
+      changes:
+        - createTable:
+            tableName: friends
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: first_wallet_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: second_wallet_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: friends
+            columnNames: first_wallet_id,second_wallet_id
+            constraintName: uq_friends_pair
+
+        - addForeignKeyConstraint:
+            baseTableName: friends
+            baseColumnNames: first_wallet_id
+            referencedTableName: players
+            referencedColumnNames: wallet_id
+            constraintName: fk_friends_first
+
+        - addForeignKeyConstraint:
+            baseTableName: friends
+            baseColumnNames: second_wallet_id
+            referencedTableName: players
+            referencedColumnNames: wallet_id
+            constraintName: fk_friends_second
+
+        - createIndex:
+            tableName: friends
+            indexName: idx_friends_first
+            columns:
+              - column:
+                  name: first_wallet_id
+
+        - createIndex:
+            tableName: friends
+            indexName: idx_friends_second
+            columns:
+              - column:
+                  name: second_wallet_id

@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-nfts
+      author: GisDuck
+      changes:
+        - createTable:
+            tableName: nfts
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: collection_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: img_url
+                  type: varchar(1024)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: wallet_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: nfts
+            baseColumnNames: wallet_id
+            referencedTableName: players
+            referencedColumnNames: wallet_id
+            constraintName: fk_nfts_wallet
+
+        - addForeignKeyConstraint:
+            baseTableName: nfts
+            baseColumnNames: collection_id
+            referencedTableName: nft_collections
+            referencedColumnNames: id
+            constraintName: fk_nfts_collection_id
+
+        - createIndex:
+            tableName: nfts
+            indexName: idx_nfts_collection
+            columns:
+              - column:
+                  name: collection_id
