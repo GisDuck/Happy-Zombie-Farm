@@ -28,9 +28,9 @@ public class TelegramAuthController {
      */
     @GetMapping
     public ResponseEntity<Resource> getAuthScript() {
-        Resource resource = new ClassPathResource("static/telegramAuth.html");
+        Resource resource = new ClassPathResource("public/index.html");
         var headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=telegramAuth.html");
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=index.html");
         return ResponseEntity.ok().headers(headers).body(resource);
     }
 
