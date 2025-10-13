@@ -20,19 +20,16 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @RequestMapping("/auth/telegram")
 public class TelegramAuthController {
 
-    @Value("TELEGRAM_BOT_TOKEN")
-    private String tgBotToken;
+//    @Value("TELEGRAM_BOT_TOKEN")
+    private String tgBotToken = "8235869467:AAFQt9QgtgiY6ubxmEYWCWcOhMwEoLoJRJQ";
 
-    /**
-     * возвращает html со скриптом для аутентификации
-     */
-    @GetMapping
-    public ResponseEntity<Resource> getAuthScript() {
-        Resource resource = new ClassPathResource("public/index.html");
-        var headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=index.html");
-        return ResponseEntity.ok().headers(headers).body(resource);
-    }
+//    @GetMapping
+//    public ResponseEntity<Resource> getAuthScript() {
+//        Resource resource = new ClassPathResource("public/index.html");
+//        var headers = new HttpHeaders();
+//        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=index.html");
+//        return ResponseEntity.ok().headers(headers).body(resource);
+//    }
 
     /**
      * сюда отправляются данные, полученные после аутентификации
