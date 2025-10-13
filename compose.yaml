@@ -76,10 +76,6 @@ services:
       - 'traefik.http.routers.app.entrypoints=websecure'
       - 'traefik.http.routers.app.tls.certresolver=le'
       - 'traefik.http.services.app.loadbalancer.server.port=8080'
-      - 'traefik.http.routers.redirect-web.entrypoints=web'
-      - 'traefik.http.routers.redirect-web.middlewares=to-https'
-      - 'traefik.http.middlewares.to-https.redirectscheme.scheme=https'
-      - 'traefik.http.middlewares.to-https.redirectscheme.permanent=true'
 
 
   traefik:
