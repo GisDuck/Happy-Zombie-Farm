@@ -117,8 +117,6 @@ services:
       - default
     labels:
       - 'traefik.enable=true'
-      - 'traefik.docker.network=proxy'
-      -
 
       # Дашборд на домене traefik.
       - 'traefik.http.routers.traefik.rule=Host(`traefik.${BASE_URL}`)'
