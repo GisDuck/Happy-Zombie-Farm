@@ -1,0 +1,22 @@
+name: Deploy-job
+
+on:
+  push:
+    branches: [ "master", "main", "develop" ]
+
+jobs:
+  hobs:
+    runs-on: ubuntu-latest
+    name: Deploy and run Docker
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: deploy file and run Docker on remote server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: 'hzfarm.ru'
+          username: 'root'
+          key: ${{ secrets.SSH_KEY_HZFARM }}
+          script: |
+            mkdir app
