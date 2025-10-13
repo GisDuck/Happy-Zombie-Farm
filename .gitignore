@@ -2,7 +2,6 @@ HELP.md
 .gradle
 build/
 postgres-data/
-pgadmin/
 logs/
 traefik/acme/
 !gradle/wrapper/gradle-wrapper.jar
