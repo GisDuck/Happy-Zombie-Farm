@@ -95,7 +95,7 @@ services:
       - --certificatesresolvers.le.acme.httpchallenge=true
       - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
       # Логи
-      - --log.level=INFO
+      - --log.level=DEBUG
     ports:
       - '80:80'
       - '443:443'
