@@ -25,9 +25,9 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_REPLACE_SERVERS_ON_STARTUP: "True"
     volumes:
-      - pgadmin-data:/var/lib/pgadmin
-    user: '5050:5050'
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
     networks:
       - proxy
     expose:
@@ -122,6 +122,3 @@ services:
       # Юзеры
       - 'traefik.http.middlewares.auth.basicauth.usersfile=/auth/users'
       - 'traefik.http.routers.traefik.middlewares=auth'
-
-volumes:
-  pgadmin-data:
