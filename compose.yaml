@@ -1,8 +1,8 @@
 networks:
-  traefik:
-    external: false
-  backend:
-    external: false
+  proxy:
+    external: true
+  default:
+    driver: bridge
 
 services:
   postgres:
@@ -26,11 +26,13 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
-    networks: [ traefik, backend ]
+    networks:
+      - proxy
     expose:
       - '80'
     labels:
       - 'traefik.enable=true'
+      - 'traefik.docker.network=proxy'
       - 'traefik.http.routers.pg.rule=Host(`pgadmin.${BASE_URL}`)'
       - 'traefik.http.routers.pg.entrypoints=websecure'
       - 'traefik.http.routers.pg.tls.certresolver=le'
@@ -62,11 +64,13 @@ services:
       - postgres
 #      - rabbitmq
 #      - minio
-    networks: [traefik, backend]
+    networks:
+      - proxy
     expose:
       - '8080'
     labels:
       - 'traefik.enable=true'
+      - 'traefik.docker.network=proxy'
       - 'traefik.http.routers.app.rule=Host(`${BASE_URL}`,`www.${BASE_URL}`)'
       - 'traefik.http.routers.app.entrypoints=websecure'
       - 'traefik.http.routers.app.tls.certresolver=le'
@@ -103,7 +107,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/acme:/letsencrypt
       - ./traefik/auth:/auth:ro
-    networks: [ traefik ]
+    networks:
+      - proxy
+      - default
     labels:
       - 'traefik.enable=true'
 
