@@ -1,11 +1,11 @@
 databaseChangeLog:
   - include:
-      file: ./changeset/001-create-players.yaml
+      file: db/changelog/changeset/001-create-players.yaml
   - include:
-      file: ./changeset/002-create-building-types.yaml
+      file: db/changelog/changeset/002-create-building-types.yaml
   - include:
-      file: ./changeset/003-create-player-buildings.yaml
+      file: db/changelog/changeset/003-create-player-buildings.yaml
   - include:
-      file: ./changeset/004-create-player-boards.yaml
+      file: db/changelog/changeset/004-create-player-boards.yaml
 
 
