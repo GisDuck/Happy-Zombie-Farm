@@ -1,6 +1,6 @@
 networks:
   proxy:
-    external: true
+    external: false
   default:
     driver: bridge
 
