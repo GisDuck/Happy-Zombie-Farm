@@ -17,7 +17,7 @@ databaseChangeLog:
               - column:
                   name: occupancy
                   type: BIT(1024)
-                  defaultValue: "B'0'"
+                  defaultValueComputed: "B'0'::bit(1024)"
                   constraints:
                     nullable: false
                   remarks: "1 — клетка занята; 0 — свободна"
