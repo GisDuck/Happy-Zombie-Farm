@@ -17,6 +17,14 @@ jobs:
         with:
           host: 'hzfarm.ru'
           username: 'root'
-          key: ${{ secrets.SSH_KEY_HZFARM }}
+          key: ${{ secrets.SSH_PRIVATE_KEY}}
           script: |
-            mkdir app
+            set -e
+            cd app
+            
+            docker compose down
+            
+            git pull origin master
+            ./gradlew bootJar
+            
+            docker compose up -d
