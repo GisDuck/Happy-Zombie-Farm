@@ -27,6 +27,8 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
     networks: [ traefik, backend ]
+    ports:
+      - '80:80'
     expose:
       - '80'
     labels:
@@ -63,6 +65,8 @@ services:
 #      - rabbitmq
 #      - minio
     networks: [traefik, backend]
+    ports:
+      - '8080:8080'
     expose:
       - '8080'
     labels:
