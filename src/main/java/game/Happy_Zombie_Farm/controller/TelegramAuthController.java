@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +21,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @RequestMapping("/auth/telegram")
 public class TelegramAuthController {
 
-//    @Value("TELEGRAM_BOT_TOKEN")
-    private String tgBotToken = "8235869467:AAFQt9QgtgiY6ubxmEYWCWcOhMwEoLoJRJQ";
+    @Value("TELEGRAM_BOT_TOKEN")
+    private String tgBotToken;
 
 //    @GetMapping
 //    public ResponseEntity<Resource> getAuthScript() {
@@ -34,7 +35,7 @@ public class TelegramAuthController {
     /**
      * сюда отправляются данные, полученные после аутентификации
      */
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public String authenticate(@RequestBody Map<String, Object> telegramData) {
         return telegramDataIsValid(telegramData) ? "pretend-that-it-is-your-token" : "error";
     }
