@@ -26,8 +26,6 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
       PGADMIN_REPLACE_SERVERS_ON_STARTUP: "True"
-    volumes:
-      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
     networks:
       - proxy
     expose:

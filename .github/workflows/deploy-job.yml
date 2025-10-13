@@ -22,7 +22,8 @@ jobs:
             set -e
             cd app
             
-            docker compose down
+            docker compose stop
+            docker compose rm -f app
             
             git pull origin master
             ./gradlew bootJar
