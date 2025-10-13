@@ -113,7 +113,6 @@ services:
       - default
     labels:
       - 'traefik.enable=true'
-
       # Дашборд на домене traefik.
       - 'traefik.http.routers.traefik.rule=Host(`traefik.${BASE_URL}`)'
       - 'traefik.http.routers.traefik.entrypoints=websecure'
