@@ -54,7 +54,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./build/libs/hzfarm.jar:/app/hzfarm.jar:ro
-      - ./.env:/.env:ro
       - ./logs:/logs
     env_file:
       - .env

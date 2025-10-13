@@ -23,8 +23,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @RequestMapping("/auth/telegram")
 public class TelegramAuthController {
 
-//    @Value("TELEGRAM_BOT_TOKEN")
-    private String tgBotToken = "8235869467:AAFQt9QgtgiY6ubxmEYWCWcOhMwEoLoJRJQ";
+    @Value("${TELEGRAM_BOT_TOKEN:}")
+    private String tgBotToken;
 
     private static final Logger log = LoggerFactory.getLogger(TelegramAuthController.class);
 
