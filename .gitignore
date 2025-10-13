@@ -4,6 +4,7 @@ build/
 postgres-data/
 pgadmin/
 logs/
+traefik/acme/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
