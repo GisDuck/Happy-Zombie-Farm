@@ -1,25 +1,40 @@
+networks:
+  traefik:
+    external: false
+  backend:
+    external: false
+
 services:
-  db:
+  postgres:
     image: postgres:15
-    container_name: db
+    container_name: postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
-    ports:
-      - '${POSTGRES_PORT}:5432'
+    networks: [backend]
+    expose:
+      - '${POSTGRES_PORT}'
 
   pgadmin:
     image: dpage/pgadmin4:9
     container_name: pgadmin
-    restart: always
+    restart: unless-stopped
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
-    ports:
-      - '${PGADMIN_PORT}:80'
+    networks: [ traefik, backend ]
+    expose:
+      - '80'
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.pg.rule=Host(`pgadmin.${BASE_URL}`)'
+      - 'traefik.http.routers.pg.entrypoints=websecure'
+      - 'traefik.http.routers.pg.tls.certresolver=le'
+      - 'traefik.http.services.pg.loadbalancer.server.port=80'
 
 #  redis:
 #    image: redis:7
@@ -30,20 +45,73 @@ services:
 #    ports:
 #      - '6379'
 
-  backend:
+  app:
     image: openjdk:17
-    container_name: backend
-    restart: always
+    container_name: app
+    restart: unless-stopped
     volumes:
-      - ./build/libs/hzfarm.jar:/app/hzfarm.jar
-      - ./.env:/.env
+      - ./build/libs/hzfarm.jar:/app/hzfarm.jar:ro
+      - ./.env:/.env:ro
       - ./logs:/logs
     env_file:
       - .env
+    environment:
+      - SERVER_FORWARD_HEADERS_STRATEGY=native
     command: [ "java", "-jar", "/app/hzfarm.jar" ]
     depends_on:
-      - db
+      - postgres
 #      - rabbitmq
 #      - minio
+    networks: [traefik, backend]
+    expose:
+      - '8080'
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.app.rule=Host(`${BASE_URL}`,`www.${BASE_URL}`)'
+      - 'traefik.http.routers.app.entrypoints=websecure'
+      - 'traefik.http.routers.app.tls.certresolver=le'
+      - 'traefik.http.services.app.loadbalancer.server.port=8080'
+
+
+  traefik:
+    image: traefik:v2.11
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      # entrypoints
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      # глобальный редирект HTTP -> HTTPS
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      # провайдер Docker
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      # панель Traefik
+      - --api.dashboard=true
+      # Let's Encrypt (HTTP-01)
+      - --certificatesresolvers.le.acme.email=${TRAEFIK_EMAIL}
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.le.acme.httpchallenge=true
+      - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
+      # Логи
+      - --log.level=INFO
     ports:
-      - '${BACKEND_PORT}:8080'
+      - '80:80'
+      - '443:443'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/acme:/letsencrypt
+      - ./traefik/auth:/auth:ro
+    networks: [ traefik ]
+    labels:
+      - 'traefik.enable=true'
+
+      # Дашборд на домене traefik.
+      - 'traefik.http.routers.traefik.rule=Host(`traefik.${BASE_URL}`)'
+      - 'traefik.http.routers.traefik.entrypoints=websecure'
+      - 'traefik.http.routers.traefik.tls.certresolver=le'
+      - 'traefik.http.routers.traefik.service=api@internal'
+      # Юзеры
+      - 'traefik.http.middlewares.auth.basicauth.usersfile=/auth/users'
+      - 'traefik.http.routers.traefik.middlewares=auth'
