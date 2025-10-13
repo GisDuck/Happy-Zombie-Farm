@@ -12,6 +12,7 @@ hubabuba
         data-onauth="onTelegramAuth(user)"></script>
 <script>
     function onTelegramAuth(user) {
+      console.log(user)
       fetch("https://hzfarm.ru/auth/telegram", {
         method: "POST",
         headers: {

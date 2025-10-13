@@ -41,6 +41,7 @@ public class TelegramAuthController {
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public String authenticate(@RequestBody Map<String, Object> telegramData) {
+        log.info("user telegramData" + telegramData.toString());
         return telegramDataIsValid(telegramData) ? "pretend-that-it-is-your-token" : "error";
     }
 
@@ -52,8 +53,8 @@ public class TelegramAuthController {
         String hash = (String) telegramData.get("hash");
         telegramData.remove("hash");
 
-        log.info("user login", telegramData);
-        log.info("user hash", hash);
+        log.info("user login" + telegramData);
+        log.info("user hash" + hash);
         log.info("user data", telegramData);
         log.info("tgBot token", tgBotToken);
 
