@@ -52,7 +52,7 @@ public class TelegramAuthController {
         String hash = (String) telegramData.get("hash");
         telegramData.remove("hash");
 
-        log.info("user login");
+        log.info("user login", telegramData);
         log.info("user hash", hash);
         log.info("user data", telegramData);
         log.info("tgBot token", tgBotToken);
