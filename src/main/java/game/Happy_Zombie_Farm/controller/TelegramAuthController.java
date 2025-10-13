@@ -23,8 +23,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @RequestMapping("/auth/telegram")
 public class TelegramAuthController {
 
-    @Value("TELEGRAM_BOT_TOKEN")
-    private String tgBotToken;
+//    @Value("TELEGRAM_BOT_TOKEN")
+    private String tgBotToken = "8235869467:AAFQt9QgtgiY6ubxmEYWCWcOhMwEoLoJRJQ";
 
     private static final Logger log = LoggerFactory.getLogger(TelegramAuthController.class);
 
@@ -41,7 +41,6 @@ public class TelegramAuthController {
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public String authenticate(@RequestBody Map<String, Object> telegramData) {
-        log.info("user telegramData" + telegramData.toString());
         return telegramDataIsValid(telegramData) ? "pretend-that-it-is-your-token" : "error";
     }
 
@@ -53,9 +52,8 @@ public class TelegramAuthController {
         String hash = (String) telegramData.get("hash");
         telegramData.remove("hash");
 
-        log.info("user login" + telegramData);
+        log.info("user telegram data" + telegramData.toString());
         log.info("user hash" + hash);
-        log.info("user data", telegramData);
         log.info("tgBot token", tgBotToken);
 
         //создаем строку проверки - сортируем все параметры и объединяем их в строку вида:
