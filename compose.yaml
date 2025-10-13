@@ -26,8 +26,9 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
     volumes:
-      - pgadmin-data:/var/lib/pgadmin
+      - ./pgadmin/pgadmin-data:/var/lib/pgadmin
       - ./pgadmin/storage:/var/lib/pgadmin/storage
+    user: '5050:5050'
     networks:
       - proxy
     expose:
@@ -122,6 +123,3 @@ services:
       # Юзеры
       - 'traefik.http.middlewares.auth.basicauth.usersfile=/auth/users'
       - 'traefik.http.routers.traefik.middlewares=auth'
-
-volumes:
-  pgadmin-data:
