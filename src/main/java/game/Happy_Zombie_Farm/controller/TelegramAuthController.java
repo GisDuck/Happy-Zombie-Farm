@@ -1,5 +1,7 @@
 package game.Happy_Zombie_Farm.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -23,6 +25,8 @@ public class TelegramAuthController {
 
     @Value("TELEGRAM_BOT_TOKEN")
     private String tgBotToken;
+
+    private static final Logger log = LoggerFactory.getLogger(TelegramAuthController.class);
 
 //    @GetMapping
 //    public ResponseEntity<Resource> getAuthScript() {
@@ -48,6 +52,11 @@ public class TelegramAuthController {
         String hash = (String) telegramData.get("hash");
         telegramData.remove("hash");
 
+        log.info("user login");
+        log.info("user hash", hash);
+        log.info("user data", telegramData);
+        log.info("tgBot token", tgBotToken);
+
         //создаем строку проверки - сортируем все параметры и объединяем их в строку вида:
         //auth_date=<auth_date>\nfirst_name=<first_name>\nid=<id>\nusername=<username>
         StringBuilder sb = new StringBuilder();
@@ -62,6 +71,8 @@ public class TelegramAuthController {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] key = digest.digest(tgBotToken.getBytes(UTF_8));
 
+            log.info("tgBotHash", key);
+
             //создаем HMAC со сгенерированным хэшем
             Mac hmac = Mac.getInstance("HmacSHA256");
             SecretKeySpec secretKeySpec = new SecretKeySpec(key, "HmacSHA256");
@@ -73,6 +84,8 @@ public class TelegramAuthController {
             for (byte b : hmacBytes) {
                 validateHash.append(String.format("%02x", b));
             }
+
+            log.info("validateHash", validateHash);
 
             // сравниваем полученный от телеграма и сгенерированный хэш
             return hash.contentEquals(validateHash);
