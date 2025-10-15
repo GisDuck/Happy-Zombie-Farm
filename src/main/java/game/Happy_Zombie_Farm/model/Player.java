@@ -26,7 +26,7 @@ public class Player {
     @Id
     @Column(name = "telegram_id", nullable = false)
     @NotNull
-    private Integer telegramId;
+    private Long telegramId;
 
     @Column
     private String username;

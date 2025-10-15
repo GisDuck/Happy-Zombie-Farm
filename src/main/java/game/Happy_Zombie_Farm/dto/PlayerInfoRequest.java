@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PlayerInfoRequest {
     @NotNull
-    private Integer telegramId;
+    private Long telegramId;
     @NotNull
     private String photoUrl;
     @NotNull

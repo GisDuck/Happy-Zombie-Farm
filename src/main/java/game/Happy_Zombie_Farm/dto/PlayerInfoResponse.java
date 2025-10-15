@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 public record PlayerInfoResponse (
-    Integer telegramId,
+    Long telegramId,
     String username,
     String photoUrl,
     Long brains,
