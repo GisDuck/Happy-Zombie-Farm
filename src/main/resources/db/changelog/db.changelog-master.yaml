@@ -7,5 +7,5 @@ databaseChangeLog:
       file: db/changelog/changeset/003-create-player-buildings.yaml
   - include:
       file: db/changelog/changeset/004-create-player-boards.yaml
-  - include:
-      file: db/changelog/changeset/005-change-type-occupied_cells.yaml
+
+

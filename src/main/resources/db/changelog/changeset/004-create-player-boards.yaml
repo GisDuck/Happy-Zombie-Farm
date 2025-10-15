@@ -16,8 +16,8 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: occupied_cells
-                  type: BIT(1024)
-                  defaultValueComputed: "B'0'::bit(1024)"
+                  type: VARCHAR(1024)
+                  defaultValueComputed: "repeat('0', 1024)"
                   constraints:
                     nullable: false
                   remarks: "1 — клетка занята; 0 — свободна"
