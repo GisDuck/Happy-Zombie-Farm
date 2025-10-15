@@ -67,9 +67,10 @@ public class PlayerService {
         Player player = new Player();
         player.setTelegramId(req.getTelegramId());
         player.setPhotoUrl(req.getPhotoUrl());
-        player.setUsername(player.getUsername());
+        player.setUsername(req.getUsername());
         player.setBrains(startBrain);
         player.setMoney(startMoney);
+        player.
 
         log.info("player", player.toString());
 
