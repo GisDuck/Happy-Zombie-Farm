@@ -2,13 +2,12 @@ package game.Happy_Zombie_Farm.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.OffsetDateTime;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -46,9 +45,10 @@ public class PlayerBuilding {
     @NotNull
     private BuildingType buildingType;
 
+    // доска 32x32 → координаты 0..31
     @Column(name = "origin_x", nullable = false)
     @NotNull
-    @Min(0) @Max(31) // доска 32x32 → координаты 0..31
+    @Min(0) @Max(31)
     private Short originX;
 
     @Column(name = "origin_y", nullable = false)

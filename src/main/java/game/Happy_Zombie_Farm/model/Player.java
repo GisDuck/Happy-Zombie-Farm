@@ -2,16 +2,14 @@ package game.Happy_Zombie_Farm.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -54,10 +52,6 @@ public class Player {
     @NotNull
     private Integer moneyPerMinute = 0;
 
-    @Column(name = "last_sync_at", nullable = false)
-    @NotNull
-    private OffsetDateTime lastSyncAt;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     @NotNull
     private OffsetDateTime createdAt;
@@ -87,7 +81,6 @@ public class Player {
         OffsetDateTime now = OffsetDateTime.now();
         if (createdAt == null) createdAt = now;
         if (updatedAt == null) updatedAt = now;
-        if (lastSyncAt == null) lastSyncAt = now;
     }
 
     @PreUpdate
