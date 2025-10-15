@@ -7,7 +7,7 @@ import java.util.Optional;
 
 @Repository
 public interface PlayerBoardRepository extends JpaRepository<PlayerBoard, Integer> {
-    Optional<PlayerBoard> findByPlayerId(Integer playerId);
+    Optional<PlayerBoard> findByPlayerId(Long playerId);
     boolean existsByPlayerId(Integer playerId);
 }
 

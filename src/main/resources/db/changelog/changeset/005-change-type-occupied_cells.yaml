@@ -1,0 +1,4 @@
+- modifyDataType:
+    tableName: player_boards
+    columnName: occupied_cells
+    newDataType: VARCHAR(1024)
