@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class BuildRequest {
     @NotNull
-    private Integer telegramId;
+    private Long telegramId;
     @NotBlank
     private String buildingCode; // код типа строения
     @Min(0) @Max(31)
