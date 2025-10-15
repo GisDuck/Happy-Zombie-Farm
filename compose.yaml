@@ -97,7 +97,10 @@ services:
       - --certificatesresolvers.le.acme.httpchallenge=true
       - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
       # Логи
-      - --log.level=DEBUG
+      - --log.level=INFO
+    depends_on:
+      - pgadmin
+      - app
     ports:
       - '80:80'
       - '443:443'
