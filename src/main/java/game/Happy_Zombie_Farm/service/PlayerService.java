@@ -36,9 +36,9 @@ public class PlayerService {
     @Value("${START_MONEY:}")
     private Long startMoney;
 
-    public PlayerInfoResponse getPlayerInfoResponse(Integer telegramId) {
+    public PlayerInfoResponse getPlayerInfoResponse(Long telegramId) {
 
-        log.info("telegramId", telegramId);
+        log.info("telegramId", telegramId.toString());
 
         Player player = playerRepository.findByTelegramId(telegramId)
             .orElseThrow(() -> new NoPlayerException(telegramId));
@@ -62,7 +62,7 @@ public class PlayerService {
 
     @Transactional
     public PlayerInfoResponse createNewPlayer(PlayerInfoRequest req) {
-        log.info("reg", req);
+        log.info("reg", req.toString());
 
         Player player = new Player();
         player.setTelegramId(req.getTelegramId());
@@ -77,6 +77,8 @@ public class PlayerService {
         board.setPlayer(player);
         board.setOccupiedCells("0".repeat(32 * 32));
         playerBoardRepository.save(board);
+
+        player.setBoard(board);
 
         log.info("board", board.toString());
 

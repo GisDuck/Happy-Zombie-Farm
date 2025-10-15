@@ -5,9 +5,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class NoPlayerException extends RuntimeException {
-    private final Integer telegramId;
+    private final Long telegramId;
 
-    public NoPlayerException(Integer telegramId) {
+    public NoPlayerException(Long telegramId) {
         super("Player not found by telegramId=" + telegramId);
         this.telegramId = telegramId;
     }
@@ -17,7 +17,7 @@ public class NoPlayerException extends RuntimeException {
         this.telegramId = null;
     }
 
-    public Integer getTelegramId() {
+    public Long getTelegramId() {
         return telegramId;
     }
 }

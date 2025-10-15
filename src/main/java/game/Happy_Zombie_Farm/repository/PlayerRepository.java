@@ -6,8 +6,8 @@ import game.Happy_Zombie_Farm.model.Player;
 import java.util.Optional;
 
 @Repository
-public interface PlayerRepository extends JpaRepository<Player, Integer> {
-    Optional<Player> findByTelegramId(Integer telegramId);
+public interface PlayerRepository extends JpaRepository<Player, Long> {
+    Optional<Player> findByTelegramId(Long telegramId);
     Optional<Player> findByUsername(String username);
     boolean existsByTelegramId(Integer telegramId);
     boolean existsByUsername(String username);

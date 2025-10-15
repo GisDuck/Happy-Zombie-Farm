@@ -16,7 +16,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: player_id
-                  type: INTEGER
+                  type: BIGINT
                   constraints:
                     nullable: false
                   remarks: "FK -> players(telegram_id)"
