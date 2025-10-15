@@ -34,9 +34,9 @@ public class PlayerBoard {
     @NotBlank
     @Pattern(
         regexp = "[01]{1024}",
-        message = "occupancy должен быть строкой из 1024 символов 0/1"
+        message = "occupied_cells должен быть строкой из 1024 символов 0/1"
     )
-    private String occupancy;
+    private String occupiedCells;
 
     @Column(name = "updated_at", nullable = false)
     @NotNull

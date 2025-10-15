@@ -10,12 +10,5 @@ import java.util.List;
 
 @Repository
 public interface PlayerBuildingRepository extends JpaRepository<PlayerBuilding, Long> {
-    List<PlayerBuilding> findByPlayerId(Integer playerId);
-
-    Page<PlayerBuilding> findByPlayerId(Integer playerId, Pageable pageable);
-
-    List<PlayerBuilding> findByPlayerIdAndBuildingType_Code(Integer playerId, String code);
-
-    boolean existsByPlayerIdAndBuildingType_Code(Integer playerId, String code);
 }
 
