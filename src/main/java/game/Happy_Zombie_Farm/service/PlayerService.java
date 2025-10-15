@@ -1,5 +1,6 @@
 package game.Happy_Zombie_Farm.service;
 
+import game.Happy_Zombie_Farm.controller.TelegramAuthController;
 import game.Happy_Zombie_Farm.dto.PlayerBuildingDto;
 import game.Happy_Zombie_Farm.dto.PlayerInfoRequest;
 import game.Happy_Zombie_Farm.dto.PlayerInfoResponse;
@@ -7,6 +8,8 @@ import game.Happy_Zombie_Farm.exception.NoPlayerException;
 import game.Happy_Zombie_Farm.model.Player;
 import game.Happy_Zombie_Farm.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +25,8 @@ public class PlayerService {
     private final PlayerBoardService playerBoardService;
     private final PlayerBuildingService playerBuildingService;
 
+    private static final Logger log = LoggerFactory.getLogger(PlayerService.class);
+
     @Value("${START_BRAIN:}")
     private Long startBrain;
 
@@ -29,6 +34,9 @@ public class PlayerService {
     private Long startMoney;
 
     public PlayerInfoResponse getPlayerInfoResponse(Integer telegramId) {
+
+        log.info("telegramId", telegramId);
+
         Player player = playerRepository.findByTelegramId(telegramId)
             .orElseThrow(() -> new NoPlayerException(telegramId));
 
@@ -49,13 +57,18 @@ public class PlayerService {
         );
     }
 
-    public PlayerInfoResponse createNewPlayer(PlayerInfoRequest playerInfoRequest) {
+    @Transactional
+    public PlayerInfoResponse createNewPlayer(PlayerInfoRequest req) {
+        log.info("reg", req);
+
         Player player = new Player();
-        player.setTelegramId(playerInfoRequest.getTelegramId());
-        player.setPhotoUrl(playerInfoRequest.getPhotoUrl());
+        player.setTelegramId(req.getTelegramId());
+        player.setPhotoUrl(req.getPhotoUrl());
         player.setUsername(player.getUsername());
         player.setBrains(startBrain);
         player.setMoney(startMoney);
+
+        log.info("player", player.toString());
 
         playerRepository.save(player);
 
