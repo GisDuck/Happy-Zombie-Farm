@@ -74,10 +74,9 @@ public class PlayerService {
         log.info("player", player.toString());
 
         PlayerBoard board = new PlayerBoard();
-        board.setPlayer(player);
         board.setOccupiedCells("0".repeat(32 * 32));
-        playerBoardRepository.save(board);
 
+        board.setPlayer(player);
         player.setBoard(board);
 
         log.info("board", board.toString());

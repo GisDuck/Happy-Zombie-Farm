@@ -16,7 +16,7 @@ public class PlayerBoard {
 
     @Id
     @Column(name = "player_id", nullable = false)
-    private Integer playerId;
+    private Long playerId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
