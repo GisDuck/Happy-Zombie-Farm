@@ -1,4 +1,9 @@
-- modifyDataType:
-    tableName: player_boards
-    columnName: occupied_cells
-    newDataType: VARCHAR(1024)
+databaseChangeLog:
+    - changeSet:
+      id: 005-change-type-occupied_cells
+      author: you
+      changes:
+        - modifyDataType:
+            tableName: player_boards
+            columnName: occupied_cells
+            newDataType: VARCHAR(1024)
