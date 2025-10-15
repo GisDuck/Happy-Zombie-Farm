@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleOther(Exception ex, WebRequest req) {
         String path = req.getDescription(false).replace("uri=", "");
-        ErrorResponse body = ErrorResponse.of(500, "Internal server error", path);
+        ErrorResponse body = ErrorResponse.of(500, ex.getMessage(), path);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 }
