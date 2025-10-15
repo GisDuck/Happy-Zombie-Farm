@@ -6,6 +6,8 @@ import game.Happy_Zombie_Farm.dto.PlayerInfoRequest;
 import game.Happy_Zombie_Farm.dto.PlayerInfoResponse;
 import game.Happy_Zombie_Farm.exception.NoPlayerException;
 import game.Happy_Zombie_Farm.model.Player;
+import game.Happy_Zombie_Farm.model.PlayerBoard;
+import game.Happy_Zombie_Farm.repository.PlayerBoardRepository;
 import game.Happy_Zombie_Farm.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PlayerService {
     private final PlayerRepository playerRepository;
+    private final PlayerBoardRepository playerBoardRepository;
     private final PlayerBoardService playerBoardService;
     private final PlayerBuildingService playerBuildingService;
 
@@ -70,8 +73,14 @@ public class PlayerService {
 
         log.info("player", player.toString());
 
-        playerRepository.save(player);
+        PlayerBoard board = new PlayerBoard();
+        board.setPlayer(player);
+        board.setOccupiedCells("0".repeat(32 * 32));
+        playerBoardRepository.save(board);
 
+        log.info("board", board.toString());
+
+        playerRepository.save(player);
         return new PlayerInfoResponse(
                 player.getTelegramId(),
                 player.getUsername(),
