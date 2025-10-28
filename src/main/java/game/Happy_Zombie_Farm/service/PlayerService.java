@@ -70,7 +70,6 @@ public class PlayerService {
         player.setUsername(req.getUsername());
         player.setBrains(startBrain);
         player.setMoney(startMoney);
-        player.
 
         log.info("player", player.toString());
 
