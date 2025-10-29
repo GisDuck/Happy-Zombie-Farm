@@ -1,5 +1,6 @@
 package game.Happy_Zombie_Farm.controller;
 
+import game.Happy_Zombie_Farm.config.HouseInfoCfg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,8 @@ public class TelegramAuthController {
     @Value("${TELEGRAM_BOT_TOKEN:}")
     private String tgBotToken;
 
+    private HouseInfoCfg houseInfoCfg;
+
     private static final Logger log = LoggerFactory.getLogger(TelegramAuthController.class);
 
 //    @GetMapping
@@ -41,7 +44,7 @@ public class TelegramAuthController {
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public String authenticate(@RequestBody Map<String, Object> telegramData) {
-        return telegramDataIsValid(telegramData) ? "pretend-that-it-is-your-token" : "error";
+        return telegramDataIsValid(telegramData) ? "pretend-that-it-is-your-token" + houseInfoCfg.house().levels().toString() : "error";
     }
 
     /**
