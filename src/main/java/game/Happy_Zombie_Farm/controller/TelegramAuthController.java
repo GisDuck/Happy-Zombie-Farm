@@ -44,7 +44,7 @@ public class TelegramAuthController {
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public String authenticate(@RequestBody Map<String, Object> telegramData) {
-        return telegramDataIsValid(telegramData) ? "pretend-that-it-is-your-token" + houseInfoCfg.house().levels().toString() : "error";
+        return telegramDataIsValid(telegramData) ? "pretend-that-it-is-your-token" + houseInfoCfg.house().width() : "error";
     }
 
     /**
