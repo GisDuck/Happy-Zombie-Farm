@@ -3,6 +3,7 @@ package game.Happy_Zombie_Farm.controller;
 import game.Happy_Zombie_Farm.config.HouseInfoCfg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -27,8 +28,6 @@ public class TelegramAuthController {
     @Value("${TELEGRAM_BOT_TOKEN:}")
     private String tgBotToken;
 
-    private HouseInfoCfg houseInfoCfg;
-
     private static final Logger log = LoggerFactory.getLogger(TelegramAuthController.class);
 
 //    @GetMapping
@@ -38,6 +37,9 @@ public class TelegramAuthController {
 //        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=index.html");
 //        return ResponseEntity.ok().headers(headers).body(resource);
 //    }
+
+    @Autowired
+    private HouseInfoCfg houseInfoCfg;  // теперь Spring внедрит бин
 
     /**
      * сюда отправляются данные, полученные после аутентификации
