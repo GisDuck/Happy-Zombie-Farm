@@ -2,47 +2,6 @@ server:
   port: 8080
   address: 0.0.0.0
 
-house-info:
-  FARM:
-    width: 2
-    height: 2
-    levels:
-      1:
-        price: 0
-        cows: 6
-      2:
-        price: 200
-        cows: 8
-      3:
-        price: 300
-        cows: 10
-    skins:
-      - { id: 1001, price: 200 }
-      - { id: 1002, price: 300 }
-
-  HOUSE:
-    width: 2
-    height: 2
-    levels:
-      1:
-        price: 0
-        cows: 6
-      2:
-        price: 200
-        cows: 8
-      3:
-        price: 300
-        cows: 10
-    skins:
-      - { id: 1001, price: 200 }
-      - { id: 1002, price: 300 }
-
-  DECOR:
-    skins:
-      - { id: 3001, price: 300,  width: 1, height: 1 }
-      - { id: 3002, price: 200, width: 2, height: 1 }
-      - { id: 3003, price: 100, width: 2, height: 2 }
-
 spring:
   application:
     name: Happy-Zombie-Farm
