@@ -28,6 +28,9 @@ public class TelegramAuthController {
     @Value("${TELEGRAM_BOT_TOKEN:}")
     private String tgBotToken;
 
+    @Autowired
+    private HouseInfoCfg houseInfoCfg;
+
     private static final Logger log = LoggerFactory.getLogger(TelegramAuthController.class);
 
 //    @GetMapping
@@ -38,15 +41,12 @@ public class TelegramAuthController {
 //        return ResponseEntity.ok().headers(headers).body(resource);
 //    }
 
-    @Autowired
-    private HouseInfoCfg houseInfoCfg;  // теперь Spring внедрит бин
-
     /**
      * сюда отправляются данные, полученные после аутентификации
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public String authenticate(@RequestBody Map<String, Object> telegramData) {
-        return telegramDataIsValid(telegramData) ? "pretend-that-it-is-your-token" + houseInfoCfg.house().width() : "error";
+        return telegramDataIsValid(telegramData) ? "pretend-that-it-is-your-token" + houseInfoCfg.house().levels().toString() : "error";
     }
 
     /**
