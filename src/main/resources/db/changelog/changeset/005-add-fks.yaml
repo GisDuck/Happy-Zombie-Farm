@@ -1,0 +1,28 @@
+databaseChangeLog:
+  # users_auth.inner_id -> players.id
+  - changeSet:
+      id: 005-1-fk-users-auth-player
+      author: GisDuck
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: users_auth
+            baseColumnNames: inner_id
+            referencedTableName: players
+            referencedColumnNames: id
+            constraintName: fk_users_auth_player
+            onDelete: CASCADE
+            onUpdate: CASCADE
+
+  # houses.user_id -> players.id
+  - changeSet:
+      id: 005-2-fk-houses-player
+      author: GisDuck
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: houses
+            baseColumnNames: user_id
+            referencedTableName: players
+            referencedColumnNames: id
+            constraintName: fk_houses_player
+            onDelete: CASCADE
+            onUpdate: CASCADE

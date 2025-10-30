@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-1-create-color-enum
+      author: GisDuck
+      changes:
+        - sql:
+            sql: |
+              DO $$
+              BEGIN
+                IF NOT EXISTS (
+                  SELECT 1 FROM pg_type WHERE typname = 'color'
+                ) THEN
+                  CREATE TYPE color AS ENUM ('ORANGE', 'GREEN');
+                END IF;
+              END$$;
+
+  - changeSet:
+      id: 001-2-create-house-type-enum
+      author: GisDuck
+      changes:
+        - sql:
+            sql: |
+              DO $$
+              BEGIN
+                IF NOT EXISTS (
+                  SELECT 1 FROM pg_type WHERE typname = 'house_type'
+                ) THEN
+                  CREATE TYPE house_type AS ENUM ('FARM', 'DECOR', 'HOUSE');
+                END IF;
+              END$$;

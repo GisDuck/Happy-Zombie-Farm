@@ -3,38 +3,48 @@ house-info:
     width: 2
     height: 2
     levels:
-      1:
+      0:
         price: 0
+        cows: 5
+      1:
+        price: 10
         cows: 6
       2:
-        price: 200
+        price: 15
         cows: 8
       3:
-        price: 300
+        price: 20
         cows: 10
     skins:
-      - { id: 1001, price: 200 }
-      - { id: 1002, price: 300 }
+      - { id: 1001, price: 20 }
+      - { id: 1002, price: 30 }
 
   HOUSE:
     width: 2
     height: 2
     levels:
-      1:
+      0:
         price: 0
-        cows: 6
+        max-brain: 6
+        max-meat: 6
+      1:
+        price: 100
+        max-brain: 200
+        max-meat: 1000
       2:
-        price: 200
-        cows: 8
+        price: 150
+        max-brain: 300
+        max-meat: 1500
       3:
-        price: 300
-        cows: 10
+        price: 250
+        max-brain: 500
+        max-meat: 2500
     skins:
-      - { id: 1001, price: 200 }
-      - { id: 1002, price: 300 }
+      - { id: 1001, price: 20 }
+      - { id: 1002, price: 30 }
 
   DECOR:
     skins:
-      - { id: 3001, price: 300,  width: 1, height: 1 }
-      - { id: 3002, price: 200, width: 2, height: 1 }
-      - { id: 3003, price: 100, width: 2, height: 2 }
+      - { id: 3001, price: 30,  width: 1, height: 1 }
+      - { id: 3002, price: 20, width: 2, height: 1 }
+      - { id: 3003, price: 10, width: 2, height: 2 }

@@ -9,35 +9,61 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @ConfigurationProperties(prefix = "house-info")
 public record HouseInfoCfg(
-        @NotNull BuildingCfg farm,
-        @NotNull BuildingCfg house,
-        @NotNull DecorCfg   decor
+        @NotNull FarmCfg  farm,
+        @NotNull HouseCfg house,
+        @NotNull DecorCfg decor
 ) {
-    //Общая схема для FARM/HOUSE
+    // ----- FARM -----
     @Validated
-    public record BuildingCfg(
+    public record FarmCfg(
             @Positive int width,
             @Positive int height,
-            @NotNull Map<@Positive Integer, LevelCfg> levels,
-            @NotEmpty List<SkinCfg> skins
+            @NotEmpty Map<@Positive Integer, @NotNull FarmLevelCfg> levels,
+            @NotNull List<@NotNull SkinCfg> skins
     ) {}
 
     @Validated
-    public record DecorCfg(
-            @NotEmpty List<SkinCfg> skins
-    ) {}
-
-    public record LevelCfg(
+    public record FarmLevelCfg(
             @PositiveOrZero int price,
-            @PositiveOrZero Integer cows   // для HOUSE можно игнорировать, если не нужно
+            @PositiveOrZero int cows
     ) {}
 
-    // Скин. Для DECOR в скинах width/height обязательны, для FARM/HOUSE нет
+    // ----- HOUSE -----
+    @Validated
+    public record HouseCfg(
+            @Positive int width,
+            @Positive int height,
+            @NotEmpty Map<@Positive Integer, @NotNull HouseLevelCfg> levels,
+            @NotNull List<@NotNull SkinCfg> skins
+    ) {}
+
+    @Validated
+    public record HouseLevelCfg(
+            @PositiveOrZero int price,
+            // YAML: max-brain / max-meat → поля ниже
+            @PositiveOrZero int maxBrain,
+            @PositiveOrZero int maxMeat
+    ) {}
+
+    // ----- DECOR -----
+    @Validated
+    public record DecorCfg(
+            @NotNull List<@NotNull DecorSkinCfg> skins
+    ) {}
+
+    // Скин для FARM/HOUSE
     @Validated
     public record SkinCfg(
             @Positive int id,
+            @PositiveOrZero int price
+    ) {}
+
+    // Скин для DECOR
+    @Validated
+    public record DecorSkinCfg(
+            @Positive int id,
             @PositiveOrZero int price,
-            @PositiveOrZero Integer width,
-            @PositiveOrZero Integer height
+            @Positive int width,
+            @Positive int height
     ) {}
 }
