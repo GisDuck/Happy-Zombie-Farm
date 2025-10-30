@@ -1,5 +1,6 @@
 package game.Happy_Zombie_Farm.config;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import java.util.List;
@@ -8,6 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @ConfigurationProperties(prefix = "house-info")
 public record HouseInfoCfg(
         @NotEmpty Map<@NotNull String, @NotNull HouseCfg> type
