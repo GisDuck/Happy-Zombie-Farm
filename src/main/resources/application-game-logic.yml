@@ -5,3 +5,5 @@ game-logic:
   conversion:
     meat-per-one-brain: 5
     brain-per-one-coin: 5
+
+  return-gold-for-house: 0.5

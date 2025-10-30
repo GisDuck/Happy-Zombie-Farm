@@ -15,7 +15,8 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "game-logic")
 public record GameLogicCfg(
         @NotEmpty Production production,
-        @NotEmpty Conversion conversion
+        @NotEmpty Conversion conversion,
+        @NotNull Double returnGoldForHouse
 ) {
     @Validated
     public record Production(

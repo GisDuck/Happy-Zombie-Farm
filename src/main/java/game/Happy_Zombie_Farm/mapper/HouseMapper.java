@@ -1,6 +1,6 @@
 package game.Happy_Zombie_Farm.mapper;
 
-import game.Happy_Zombie_Farm.dto.outputDto.HouseDto;
+import game.Happy_Zombie_Farm.dto.HouseDto;
 import game.Happy_Zombie_Farm.entity.House;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;

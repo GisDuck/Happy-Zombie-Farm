@@ -49,5 +49,26 @@ public class PlayerService {
             throw new NotEnoughGoldException(player.getId(), gold);
         }
     }
+
+    @Transactional
+    public void returnMoney(Long gold, Player player) throws NotEnoughGoldException {
+        if (isEnoughGold(gold, player)) {
+            player.setGold(player.getGold() + gold);
+        } else {
+            throw new NotEnoughGoldException(player.getId(), gold);
+        }
+    }
+
+    @Transactional
+    public void returnMoney(Long gold, Long playerId) throws NotEnoughGoldException, NoPlayerException {
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new NoPlayerException(playerId));
+
+        if (isEnoughGold(gold, player)) {
+            player.setGold(player.getGold() + gold);
+        } else {
+            throw new NotEnoughGoldException(player.getId(), gold);
+        }
+    }
 }
 

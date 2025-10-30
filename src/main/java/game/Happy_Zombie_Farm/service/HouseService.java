@@ -1,13 +1,15 @@
 package game.Happy_Zombie_Farm.service;
 
+import game.Happy_Zombie_Farm.config.GameLogicCfg;
 import game.Happy_Zombie_Farm.config.HousesInfoCfg;
 import game.Happy_Zombie_Farm.dto.inputDto.*;
-import game.Happy_Zombie_Farm.dto.outputDto.DeleteHousePayloadDto;
-import game.Happy_Zombie_Farm.dto.outputDto.HouseDto;
+import game.Happy_Zombie_Farm.dto.outputDto.RemoveHousePayloadDto;
+import game.Happy_Zombie_Farm.dto.HouseDto;
 import game.Happy_Zombie_Farm.entity.House;
 import game.Happy_Zombie_Farm.entity.Player;
 import game.Happy_Zombie_Farm.exception.NoHouseException;
 import game.Happy_Zombie_Farm.exception.NoPlayerException;
+import game.Happy_Zombie_Farm.exception.NotThisPlayerHouseIdException;
 import game.Happy_Zombie_Farm.mapper.HouseMapper;
 import game.Happy_Zombie_Farm.repository.HouseRepository;
 import game.Happy_Zombie_Farm.repository.PlayerRepository;
@@ -27,13 +29,22 @@ public class HouseService {
     private HouseMapper houseMapper;
     @Autowired
     private HousesInfoCfg housesInfoCfg;
+    @Autowired
+    private GameLogicCfg gameLogicCfg;
 
     @Transactional
-    public HouseDto buildHouse(Long playerId, BuildHouseInputDto input) throws NoPlayerException {
+    public HouseDto buildHouse(BuildHouseInputDto input) throws NoPlayerException {
+        Long playerId = 0L; //!!!ДОСТАТЬ ИЗ СЕКЬЮРИТИ!!!
+
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new NoPlayerException(playerId));
 
-        Long gold = housesInfoCfg.type().get(input.type()).skins().get(input.skin()).price();
+        Long gold = housesInfoCfg
+            .type()
+            .get(input.type())
+            .skins()
+            .get(input.skin())
+            .price();
 
         playerService.takeMoney(gold, player);
 
@@ -50,33 +61,81 @@ public class HouseService {
     }
 
     @Transactional
-    public HouseDto updateHouseLevel(HouseIdInputDto input) throws NoHouseException {
-
-        //!!!!!!ДОБАВИТЬ ПРОВЕРКУ ДЕНЕГ!!!!!!!!
+    public HouseDto updateHouseLevel(HouseIdInputDto input)
+            throws NoHouseException,
+            NotThisPlayerHouseIdException
+    {
+        Long playerId = 0L; //!!!ДОСТАТЬ ИЗ СЕКЬЮРИТИ!!!
 
         House house = houseRepository.findById(input.houseId())
                 .orElseThrow(() -> new NoHouseException(input.houseId()));
+
+        Player player = house.getPlayer();
+
+        if (player.getId() != playerId) {
+            throw new NotThisPlayerHouseIdException(input.houseId());
+        }
+
+        Long gold = housesInfoCfg
+            .type()
+            .get(house.getType())
+            .levels()
+            .get(house.getLevel() + 1)
+            .price();
+
+        playerService.takeMoney(gold, player);
+
         house.setLevel(house.getLevel() + 1);
         house = houseRepository.save(house);
         return houseMapper.toDto(house);
     }
 
     @Transactional
-    public HouseDto updateHouseSkin(UpdateHouseSkinInputDto input) throws NoHouseException {
-
-        //!!!!!!ДОБАВИТЬ ПРОВЕРКУ ДЕНЕГ!!!!!!!!
+    public HouseDto updateHouseSkin(UpdateHouseSkinInputDto input)
+            throws NoHouseException,
+            NotThisPlayerHouseIdException
+    {
+        Long playerId = 0L; //!!!ДОСТАТЬ ИЗ СЕКЬЮРИТИ!!!
 
         House house = houseRepository.findById(input.houseId())
                 .orElseThrow(() -> new NoHouseException(input.houseId()));
+
+        Player player = house.getPlayer();
+
+        if (player.getId() != playerId) {
+            throw new NotThisPlayerHouseIdException(input.houseId());
+        }
+
+        Long newSkinPrice = housesInfoCfg
+            .type()
+            .get(house.getType())
+            .skins()
+            .get(input.newSkin())
+            .price();
+
+        playerService.takeMoney(newSkinPrice, player);
+
         house.setSkin(input.newSkin());
         house = houseRepository.save(house);
         return houseMapper.toDto(house);
     }
 
     @Transactional
-    public HouseDto updateHouseLocation(UpdateHouseLocationInputDto input) throws NoHouseException {
+    public HouseDto updateHouseLocation(UpdateHouseLocationInputDto input)
+            throws NoHouseException,
+            NotThisPlayerHouseIdException
+    {
+        Long playerId = 0L; //!!!ДОСТАТЬ ИЗ СЕКЬЮРИТИ!!!
+
         House house = houseRepository.findById(input.houseId())
                 .orElseThrow(() -> new NoHouseException(input.houseId()));
+
+        Player player = house.getPlayer();
+
+        if (player.getId() != playerId) {
+            throw new NotThisPlayerHouseIdException(input.houseId());
+        }
+
         house.setLocationX(input.newLocationX());
         house.setLocationY(input.newLocationY());
         house = houseRepository.save(house);
@@ -84,16 +143,39 @@ public class HouseService {
     }
 
     @Transactional
-    public DeleteHousePayloadDto deleteHouse(HouseIdInputDto input) throws NoHouseException {
+    public RemoveHousePayloadDto deleteHouse(HouseIdInputDto input) throws NoHouseException {
+        Long playerId = 0L; //!!!ДОСТАТЬ ИЗ СЕКЬЮРИТИ!!!
 
-        //!!!!!!ДОБАВИТЬ ВОЗВРАТ ДЕНЕГ!!!!!!!!
+        House house = houseRepository.findById(input.houseId())
+                .orElseThrow(() -> new NoHouseException(input.houseId()));
 
-        if (houseRepository.existsById(input.houseId())) {
-            houseRepository.deleteById(input.houseId());
-        } else {
-            throw new NoHouseException(input.houseId());
+        Player player = house.getPlayer();
+
+        if (player.getId() != playerId) {
+            throw new NotThisPlayerHouseIdException(input.houseId());
         }
-        return new DeleteHousePayloadDto(true, input.houseId());
+
+        Long gold = housesInfoCfg
+                .type()
+                .get(house.getType())
+                .skins()
+                .get(house.getSkin())
+                .price();
+
+        for (int lvl = house.getLevel(); lvl > 0; lvl--) {
+            gold += housesInfoCfg
+                    .type()
+                    .get(house.getType())
+                    .levels()
+                    .get(lvl)
+                    .price();
+        }
+
+        gold = (long) (gold * gameLogicCfg.returnGoldForHouse());
+
+        playerService.returnMoney(gold, player);
+        houseRepository.deleteById(input.houseId());
+        return new RemoveHousePayloadDto(true, input.houseId());
     }
 }
 

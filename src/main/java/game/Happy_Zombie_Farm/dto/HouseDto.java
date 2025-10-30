@@ -1,4 +1,4 @@
-package game.Happy_Zombie_Farm.dto.outputDto;
+package game.Happy_Zombie_Farm.dto;
 
 import game.Happy_Zombie_Farm.enums.HouseType;
 

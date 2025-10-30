@@ -1,11 +1,11 @@
 package game.Happy_Zombie_Farm.mapper;
 
 import game.Happy_Zombie_Farm.dto.outputDto.AuthPayloadDto;
-import game.Happy_Zombie_Farm.dto.outputDto.PlayerDto;
+import game.Happy_Zombie_Farm.dto.PlayerDto;
 import game.Happy_Zombie_Farm.entity.Player;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring", uses = {PlayerMapper.class})
+@Mapper(componentModel = "spring", uses = {PlayerMapper.class, HouseMapper.class})
 public interface AuthMapper {
 
     default AuthPayloadDto toDto(Player player, String token) {
