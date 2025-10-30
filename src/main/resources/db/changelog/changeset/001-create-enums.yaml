@@ -2,31 +2,23 @@ databaseChangeLog:
   - changeSet:
       id: 001-1-create-color-enum
       author: GisDuck
+      preConditions:
+        - not:
+            - sqlCheck:
+                expectedResult: "1"
+                sql: "select 1 from pg_type where typname = 'board_color'"
       changes:
         - sql:
-            sql: |
-              DO $do$
-              BEGIN
-                IF NOT EXISTS (
-                  SELECT 1 FROM pg_type WHERE typname = 'board_color'
-                ) THEN
-                  CREATE TYPE board_color AS ENUM ('ORANGE', 'GREEN');
-                END IF;
-              END
-              $do$;
+            sql: "CREATE TYPE board_color AS ENUM ('ORANGE', 'GREEN');"
 
   - changeSet:
       id: 001-2-create-house-type-enum
       author: GisDuck
+      preConditions:
+        - not:
+            - sqlCheck:
+                expectedResult: "1"
+                sql: "select 1 from pg_type where typname = 'house_type'"
       changes:
         - sql:
-            sql: |
-              DO $do$
-              BEGIN
-                IF NOT EXISTS (
-                  SELECT 1 FROM pg_type WHERE typname = 'house_type'
-                ) THEN
-                  CREATE TYPE house_type AS ENUM ('FARM', 'DECOR', 'STORAGE');
-                END IF;
-              END
-              $do$;
+            sql: "CREATE TYPE house_type AS ENUM ('FARM', 'DECOR', 'STORAGE');"
