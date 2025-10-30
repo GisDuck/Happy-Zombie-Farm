@@ -39,7 +39,7 @@ public class Player {
     @OneToOne(mappedBy = "player", fetch = FetchType.LAZY)
     private UserAuth userAuth;
 
-    @OneToMany(mappedBy = "player_id", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<House> houses = new HashSet<>();
 }
