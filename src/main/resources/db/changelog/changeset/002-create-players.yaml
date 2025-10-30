@@ -38,6 +38,6 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: board_color
-                  type: color
+                  type: board_color
                   constraints:
                     nullable: true
