@@ -21,7 +21,6 @@ public class TelegramAuthService {
     @Value("${TELEGRAM_BOT_TOKEN:}")
     private String tgBotToken;
 
-
     /**
      * проверяет данные, полученные из телеграм
      */
