@@ -1,6 +1,6 @@
 package game.Happy_Zombie_Farm.entity;
 
-import game.Happy_Zombie_Farm.enums.Color;
+import game.Happy_Zombie_Farm.enums.BoardColor;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,7 +34,7 @@ public class Player {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "board_color")
-    private Color boardColor;
+    private BoardColor boardColor;
 
     @OneToOne(mappedBy = "player", fetch = FetchType.LAZY)
     private UserAuth userAuth;

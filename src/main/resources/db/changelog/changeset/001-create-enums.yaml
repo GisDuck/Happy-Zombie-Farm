@@ -8,9 +8,9 @@ databaseChangeLog:
               DO $$
               BEGIN
                 IF NOT EXISTS (
-                  SELECT 1 FROM pg_type WHERE typname = 'color'
+                  SELECT 1 FROM pg_type WHERE typname = 'board_color'
                 ) THEN
-                  CREATE TYPE color AS ENUM ('ORANGE', 'GREEN');
+                  CREATE TYPE board_color AS ENUM ('ORANGE', 'GREEN');
                 END IF;
               END$$;
 
@@ -25,6 +25,6 @@ databaseChangeLog:
                 IF NOT EXISTS (
                   SELECT 1 FROM pg_type WHERE typname = 'house_type'
                 ) THEN
-                  CREATE TYPE house_type AS ENUM ('FARM', 'DECOR', 'HOUSE');
+                  CREATE TYPE house_type AS ENUM ('FARM', 'DECOR', 'STORAGE');
                 END IF;
               END$$;

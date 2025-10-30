@@ -1,5 +1,6 @@
 package game.Happy_Zombie_Farm.config;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
@@ -9,9 +10,9 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @ConfigurationProperties(prefix = "house-info")
 public record HouseInfoCfg(
-        @NotNull FarmCfg  farm,
-        @NotNull HouseCfg house,
-        @NotNull DecorCfg decor
+        @NotNull @JsonProperty("FARM") FarmCfg  farm,
+        @NotNull @JsonProperty("STORAGE") StorageCfg storage,
+        @NotNull @JsonProperty("DECOR") DecorCfg decor
 ) {
     // ----- FARM -----
     @Validated
@@ -28,19 +29,18 @@ public record HouseInfoCfg(
             @PositiveOrZero int cows
     ) {}
 
-    // ----- HOUSE -----
+    // ----- STORAGE -----
     @Validated
-    public record HouseCfg(
+    public record StorageCfg(
             @Positive int width,
             @Positive int height,
-            @NotEmpty Map<@Positive Integer, @NotNull HouseLevelCfg> levels,
+            @NotEmpty Map<@Positive Integer, @NotNull StorageLevelCfg> levels,
             @NotNull List<@NotNull SkinCfg> skins
     ) {}
 
     @Validated
-    public record HouseLevelCfg(
+    public record StorageLevelCfg(
             @PositiveOrZero int price,
-            // YAML: max-brain / max-meat → поля ниже
             @PositiveOrZero int maxBrain,
             @PositiveOrZero int maxMeat
     ) {}
@@ -51,7 +51,7 @@ public record HouseInfoCfg(
             @NotNull List<@NotNull DecorSkinCfg> skins
     ) {}
 
-    // Скин для FARM/HOUSE
+    // Скин для FARM/STORAGE
     @Validated
     public record SkinCfg(
             @Positive int id,

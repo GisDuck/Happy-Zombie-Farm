@@ -19,7 +19,7 @@ house-info:
       - { id: 1001, price: 20 }
       - { id: 1002, price: 30 }
 
-  HOUSE:
+  STORAGE:
     width: 2
     height: 2
     levels:
