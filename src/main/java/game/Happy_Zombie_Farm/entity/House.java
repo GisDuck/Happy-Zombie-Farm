@@ -17,7 +17,6 @@ public class House {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // houses.user_id -> players.id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private Player player;
@@ -35,6 +34,6 @@ public class House {
     @Column(name = "location_y", nullable = false)
     private Integer locationY;
 
-    @Column(length = 50)
-    private String skin;
+    @Column(nullable = false)
+    private Integer skin;
 }

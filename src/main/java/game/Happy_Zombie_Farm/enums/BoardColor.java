@@ -1,6 +1,6 @@
 package game.Happy_Zombie_Farm.enums;
 
-public enum Color {
+public enum BoardColor {
     ORANGE,
     GREEN
 }

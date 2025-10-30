@@ -26,7 +26,7 @@ databaseChangeLog:
               - column:
                   name: level
                   type: int
-                  defaultValueNumeric: 1
+                  defaultValueNumeric: 0
                   constraints:
                     nullable: false
               - column:
