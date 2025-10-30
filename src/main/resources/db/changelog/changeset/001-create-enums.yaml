@@ -1,12 +1,11 @@
 databaseChangeLog:
   - changeSet:
-      id: 001-1-create-color-enum
+      id: 001-1-create-board-color-enum
       author: GisDuck
       preConditions:
-        - not:
-            - sqlCheck:
-                expectedResult: "1"
-                sql: "select 1 from pg_type where typname = 'board_color'"
+        - sqlCheck:
+            expectedResult: "0"
+            sql: "select count(*) from pg_type where typname = 'board_color'"
       changes:
         - sql:
             sql: "CREATE TYPE board_color AS ENUM ('ORANGE', 'GREEN');"
@@ -15,10 +14,9 @@ databaseChangeLog:
       id: 001-2-create-house-type-enum
       author: GisDuck
       preConditions:
-        - not:
-            - sqlCheck:
-                expectedResult: "1"
-                sql: "select 1 from pg_type where typname = 'house_type'"
+        - sqlCheck:
+            expectedResult: "0"
+            sql: "select count(*) from pg_type where typname = 'house_type'"
       changes:
         - sql:
             sql: "CREATE TYPE house_type AS ENUM ('FARM', 'DECOR', 'STORAGE');"
