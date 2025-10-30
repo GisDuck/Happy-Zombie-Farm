@@ -1,8 +1,16 @@
 package game.Happy_Zombie_Farm.service;
 
-import game.Happy_Zombie_Farm.controller.TelegramAuthController;
+import game.Happy_Zombie_Farm.dto.TelegramAuthDto;
+import game.Happy_Zombie_Farm.dto.outputDto.AuthPayloadDto;
+import game.Happy_Zombie_Farm.entity.Player;
+import game.Happy_Zombie_Farm.entity.UserAuth;
+import game.Happy_Zombie_Farm.enums.BoardColor;
+import game.Happy_Zombie_Farm.mapper.PlayerMapper;
+import game.Happy_Zombie_Farm.repository.PlayerRepository;
+import game.Happy_Zombie_Farm.repository.UserAuthRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -11,12 +19,22 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Service
 public class TelegramAuthService {
+    @Autowired
+    private UserAuthRepository userAuthRepository;
+    @Autowired
+    private PlayerRepository playerRepository;
+    @Autowired
+    private PlayerMapper playerMapper;
 
     private static final Logger log = LoggerFactory.getLogger(TelegramAuthService.class);
 
@@ -26,19 +44,20 @@ public class TelegramAuthService {
     /**
      * проверяет данные, полученные из телеграм
      */
-    public boolean telegramDataIsValid(Map<String, Object> telegramData) {
+    public boolean telegramDataIsValid(TelegramAuthDto telegramAuthDto) {
         //получаем хэш, который позже будем сравнивать с остальными данными
-        String hash = (String) telegramData.get("hash");
-        telegramData.remove("hash");
+        String hash = telegramAuthDto.hash();
 
-        log.info("user telegram data" + telegramData.toString());
-        log.info("user hash" + hash);
-        log.info("tgBot token", tgBotToken);
+        log.info("user telegram data {}", telegramAuthDto);
+        log.info("user hash {}", hash);
+        log.info("tgBot token {}", tgBotToken);
+
+        Map<String, String> data = getTelegramAuthMap(telegramAuthDto);
 
         //создаем строку проверки - сортируем все параметры и объединяем их в строку вида:
         //auth_date=<auth_date>\nfirst_name=<first_name>\nid=<id>\nusername=<username>
         StringBuilder sb = new StringBuilder();
-        telegramData.entrySet().stream()
+        data.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .forEach(entry -> sb.append(entry.getKey()).append("=").append(entry.getValue()).append("\n"));
         sb.deleteCharAt(sb.length() - 1);
@@ -70,5 +89,51 @@ public class TelegramAuthService {
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public AuthPayloadDto registerTelegramUser(TelegramAuthDto telegramAuthDto) {
+
+        Player player = new Player();
+        player.setUsername(telegramAuthDto.username());
+        player.setBoardColor(getRandomBoardColor());
+        player.setMeat(0L);
+        player.setGold(0L);
+        player.setBrain(0L);
+        player = playerRepository.save(player);
+
+        UserAuth ua = new UserAuth();
+        ua.setTelegramId(telegramAuthDto.id());
+        ua.setPlayer(player);
+        ua.setCreatedAt(LocalDateTime.from(Instant.now()));
+        userAuthRepository.save(ua);
+
+        return new AuthPayloadDto(playerMapper.toDto(player), "FAKE_TOKEN");
+    }
+
+    private static BoardColor getRandomBoardColor() {
+        BoardColor[] values = BoardColor.values();
+        int idx = ThreadLocalRandom.current().nextInt(values.length);
+        return values[idx];
+    }
+
+    private static Map<String, String> getTelegramAuthMap(TelegramAuthDto telegramAuthDto) {
+        Map<String, String> data = new TreeMap<>();
+
+        if (telegramAuthDto.authDate() != null) {
+            data.put("auth_date", telegramAuthDto.authDate().toString());
+        }
+        if (telegramAuthDto.firstName() != null) {
+            data.put("first_name", telegramAuthDto.firstName());
+        }
+        if (telegramAuthDto.id() != null) {
+            data.put("id", telegramAuthDto.id().toString());
+        }
+        if (telegramAuthDto.username() != null) {
+            data.put("username", telegramAuthDto.username());
+        }
+        if (telegramAuthDto.photoUrl() != null) {
+            data.put("photo_url", telegramAuthDto.photoUrl());
+        }
+        return data;
     }
 }
