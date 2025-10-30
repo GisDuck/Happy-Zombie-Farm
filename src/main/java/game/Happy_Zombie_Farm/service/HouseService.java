@@ -1,6 +1,6 @@
 package game.Happy_Zombie_Farm.service;
 
-import game.Happy_Zombie_Farm.config.HouseInfoCfg;
+import game.Happy_Zombie_Farm.config.HousesInfoCfg;
 import game.Happy_Zombie_Farm.dto.inputDto.*;
 import game.Happy_Zombie_Farm.dto.outputDto.DeleteHousePayloadDto;
 import game.Happy_Zombie_Farm.dto.outputDto.HouseDto;
@@ -26,14 +26,14 @@ public class HouseService {
     @Autowired
     private HouseMapper houseMapper;
     @Autowired
-    private HouseInfoCfg houseInfoCfg;
+    private HousesInfoCfg housesInfoCfg;
 
     @Transactional
     public HouseDto buildHouse(Long playerId, BuildHouseInputDto input) throws NoPlayerException {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new NoPlayerException(playerId));
 
-        Long gold = houseInfoCfg.type().get(input.type()).skins().get(input.skin()).price();
+        Long gold = housesInfoCfg.type().get(input.type()).skins().get(input.skin()).price();
 
         playerService.takeMoney(gold, player);
 

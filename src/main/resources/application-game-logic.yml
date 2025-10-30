@@ -1,0 +1,7 @@
+game-logic:
+  production:
+    meat-per-cow-per-sec: 1
+
+  conversion:
+    meat-per-one-brain: 5
+    brain-per-one-coin: 5

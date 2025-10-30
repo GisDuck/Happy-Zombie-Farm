@@ -10,7 +10,7 @@ spring:
     import: optional:file:.env[.properties]
 
   profiles:
-    default: house-info
+    default: houses-info
 
   jackson:
     default-property-inclusion: non_null
