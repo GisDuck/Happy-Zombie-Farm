@@ -4,6 +4,7 @@ import game.Happy_Zombie_Farm.controller.TelegramAuthController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+@Service
 public class TelegramAuthService {
 
     private static final Logger log = LoggerFactory.getLogger(TelegramAuthService.class);
