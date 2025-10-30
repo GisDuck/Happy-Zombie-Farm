@@ -14,8 +14,8 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @ConfigurationProperties(prefix = "game-logic")
 public record GameLogicCfg(
-        @NotEmpty Production production,
-        @NotEmpty Conversion conversion,
+        @NotNull Production production,
+        @NotNull Conversion conversion,
         @NotNull Double returnGoldForHouse
 ) {
     @Validated
