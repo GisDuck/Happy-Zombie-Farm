@@ -13,14 +13,14 @@ databaseChangeLog:
             onDelete: CASCADE
             onUpdate: CASCADE
 
-  # houses.user_id -> players.id
+  # houses.player_id -> players.id
   - changeSet:
       id: 005-2-fk-houses-player
       author: GisDuck
       changes:
         - addForeignKeyConstraint:
             baseTableName: houses
-            baseColumnNames: user_id
+            baseColumnNames: player_id
             referencedTableName: players
             referencedColumnNames: id
             constraintName: fk_houses_player
