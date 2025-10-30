@@ -10,7 +10,7 @@ spring:
     import: optional:file:.env[.properties]
 
   profiles:
-    default: houses-info
+    default: houses-info, game-logic
 
   jackson:
     default-property-inclusion: non_null
