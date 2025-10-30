@@ -1,6 +1,7 @@
 package game.Happy_Zombie_Farm.controller;
 
 import game.Happy_Zombie_Farm.config.HouseInfoCfg;
+import game.Happy_Zombie_Farm.dto.TelegramAuthDto;
 import game.Happy_Zombie_Farm.service.TelegramAuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +44,7 @@ public class TelegramAuthController {
      * сюда отправляются данные, полученные после аутентификации
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public String authenticate(@RequestBody Map<String, Object> telegramData) {
-        return telegramAuthService.telegramDataIsValid(telegramData) ? "pretend-that-it-is-your-token" : "error";
+    public String authenticate(@RequestBody TelegramAuthDto telegramAuthDto) {
+        return telegramAuthService.telegramDataIsValid(telegramAuthDto) ? "pretend-that-it-is-your-token" : "error";
     }
 }

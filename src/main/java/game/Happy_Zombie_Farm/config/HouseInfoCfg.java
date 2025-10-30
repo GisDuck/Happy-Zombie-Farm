@@ -10,60 +10,30 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @ConfigurationProperties(prefix = "house-info")
 public record HouseInfoCfg(
-        @NotNull @JsonProperty("FARM") FarmCfg  farm,
-        @NotNull @JsonProperty("STORAGE") StorageCfg storage,
-        @NotNull @JsonProperty("DECOR") DecorCfg decor
+        @NotEmpty Map<@NotNull String, @NotNull HouseCfg> type
 ) {
-    // ----- FARM -----
     @Validated
-    public record FarmCfg(
+    public record HouseCfg(
             @Positive int width,
             @Positive int height,
-            @NotEmpty Map<@Positive Integer, @NotNull FarmLevelCfg> levels,
-            @NotNull List<@NotNull SkinCfg> skins
+            @NotEmpty Map<@Positive Integer, @NotNull LevelCfg> levels,
+            @NotEmpty Map<@Positive Integer, @NotNull SkinCfg> skins
     ) {}
 
     @Validated
-    public record FarmLevelCfg(
-            @PositiveOrZero int price,
-            @PositiveOrZero int cows
-    ) {}
-
-    // ----- STORAGE -----
-    @Validated
-    public record StorageCfg(
-            @Positive int width,
-            @Positive int height,
-            @NotEmpty Map<@Positive Integer, @NotNull StorageLevelCfg> levels,
-            @NotNull List<@NotNull SkinCfg> skins
-    ) {}
-
-    @Validated
-    public record StorageLevelCfg(
-            @PositiveOrZero int price,
-            @PositiveOrZero int maxBrain,
-            @PositiveOrZero int maxMeat
-    ) {}
-
-    // ----- DECOR -----
-    @Validated
-    public record DecorCfg(
-            @NotNull List<@NotNull DecorSkinCfg> skins
+    public record LevelCfg(
+            @PositiveOrZero Long price,
+            @PositiveOrZero Long cows,
+            @PositiveOrZero Long maxBrain,
+            @PositiveOrZero Long maxMeat
     ) {}
 
     // Скин для FARM/STORAGE
     @Validated
     public record SkinCfg(
-            @Positive int id,
-            @PositiveOrZero int price
-    ) {}
-
-    // Скин для DECOR
-    @Validated
-    public record DecorSkinCfg(
-            @Positive int id,
-            @PositiveOrZero int price,
+            @PositiveOrZero Long price,
             @Positive int width,
             @Positive int height
     ) {}
+
 }
