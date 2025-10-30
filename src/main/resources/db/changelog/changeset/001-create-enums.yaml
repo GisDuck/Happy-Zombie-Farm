@@ -5,14 +5,15 @@ databaseChangeLog:
       changes:
         - sql:
             sql: |
-              DO $$
+              DO $do$
               BEGIN
                 IF NOT EXISTS (
                   SELECT 1 FROM pg_type WHERE typname = 'board_color'
                 ) THEN
                   CREATE TYPE board_color AS ENUM ('ORANGE', 'GREEN');
                 END IF;
-              END$$;
+              END
+              $do$;
 
   - changeSet:
       id: 001-2-create-house-type-enum
@@ -20,11 +21,12 @@ databaseChangeLog:
       changes:
         - sql:
             sql: |
-              DO $$
+              DO $do$
               BEGIN
                 IF NOT EXISTS (
                   SELECT 1 FROM pg_type WHERE typname = 'house_type'
                 ) THEN
                   CREATE TYPE house_type AS ENUM ('FARM', 'DECOR', 'STORAGE');
                 END IF;
-              END$$;
+              END
+              $do$;
