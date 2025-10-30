@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-houses
+      author: GisDuck
+      changes:
+        - createTable:
+            tableName: houses
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: house_type
+                  constraints:
+                    nullable: false
+              - column:
+                  name: level
+                  type: int
+                  defaultValueNumeric: 1
+                  constraints:
+                    nullable: false
+              - column:
+                  name: location_x
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: location_y
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: skin
+                  type: int
+                  constraints:
+                    nullable: true
