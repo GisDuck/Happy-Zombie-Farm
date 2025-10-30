@@ -28,6 +28,7 @@ public class TelegramAuthController {
 
     private static final Logger log = LoggerFactory.getLogger(TelegramAuthController.class);
 
+    @Autowired
     private TelegramAuthService telegramAuthService;
 
 //    @GetMapping
