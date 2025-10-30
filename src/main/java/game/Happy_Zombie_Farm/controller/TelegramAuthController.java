@@ -1,27 +1,12 @@
 package game.Happy_Zombie_Farm.controller;
 
-import game.Happy_Zombie_Farm.config.HouseInfoCfg;
 import game.Happy_Zombie_Farm.dto.TelegramAuthDto;
 import game.Happy_Zombie_Farm.service.TelegramAuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Map;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 @RestController
 @RequestMapping("/auth/telegram")

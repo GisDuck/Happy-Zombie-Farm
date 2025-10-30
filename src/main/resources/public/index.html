@@ -32,6 +32,13 @@ hubabuba ПРивет с пары!
       .then(r => r.text())
       .then(alert)
       .catch(console.error);
+
+      fetch("https://hzfarm.ru/api/config/houses", {
+        method: "GET"
+      })
+      .then(r => r.text())
+      .then(alert)
+      .catch(console.error);
     }
 </script>
 
