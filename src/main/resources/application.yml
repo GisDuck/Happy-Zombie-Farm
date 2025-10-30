@@ -12,6 +12,9 @@ spring:
   profiles:
     default: house-info
 
+  jackson:
+    default-property-inclusion: non_null
+
   liquibase:
     enabled: true
 
