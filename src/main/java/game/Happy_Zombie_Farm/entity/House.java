@@ -18,7 +18,7 @@ public class House {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "player_id", nullable = false)
     private Player player;
 
     @Enumerated(EnumType.STRING)
