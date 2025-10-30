@@ -1,6 +1,6 @@
 package game.Happy_Zombie_Farm.dto.outputDto;
 
-public record DeleteHousePayloadDto(
+public record RemoveHousePayloadDto(
         boolean success,
         Long deletedHouseId
 ) {}
