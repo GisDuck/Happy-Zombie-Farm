@@ -1,8 +1,10 @@
 package game.Happy_Zombie_Farm;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
+@SpringBootApplication
 @ConfigurationPropertiesScan("game.Happy_Zombie_Farm.config")
 public class HappyZombieFarmApplication {
 
