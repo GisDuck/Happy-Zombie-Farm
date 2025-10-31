@@ -1,3 +1,7 @@
+scalar DateTime
+scalar Long
+scalar Json
+
 type Mutation {
   buildHouse(input: BuildHouseInput!): House!
   updateHouseLevel(input: HouseIdInput!): House!
@@ -84,7 +88,3 @@ enum HouseType {
   DECOR
   STORAGE
 }
-
-scalar DateTime
-scalar Long
-scalar Json

@@ -32,7 +32,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
-	implementation 'com.graphql-java:graphql-java-extended-scalars:21.0'
+	implementation 'com.graphql-java:graphql-java-extended-scalars:24.0'
 	implementation 'org.springframework.boot:spring-boot-starter-graphql'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
