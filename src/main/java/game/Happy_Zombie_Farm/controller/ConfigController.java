@@ -18,9 +18,6 @@ public class ConfigController {
     @Autowired
     private GameLogicCfg gameLogicCfg;
 
-    /**
-     * GET /api/config/house
-     * Отдаёт JSON с той же структурой, что и в YAML **/
     @GetMapping("/houses-info")
     public ResponseEntity<HousesInfoCfg> getHouseInfoConfig() {
         return ResponseEntity.ok().body(housesInfoCfg);
