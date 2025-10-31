@@ -40,7 +40,7 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring().requestMatchers(
-                "/", "/index", "/index.html",
+                "/", "/index", "/index.html", "/static/**",
                 "/public/**", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/error"
         );
     }
