@@ -3,6 +3,7 @@ package game.Happy_Zombie_Farm.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,5 +24,5 @@ public class UserAuth {
     private Player player;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 }

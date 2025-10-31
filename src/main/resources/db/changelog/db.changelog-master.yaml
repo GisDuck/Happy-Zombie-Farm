@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/changeset/004-create-houses.yaml
   - include:
       file: db/changelog/changeset/005-add-fks.yaml
+  - include:
+      file: db/changelog/changeset/006-add-player-last-meat-update.yaml

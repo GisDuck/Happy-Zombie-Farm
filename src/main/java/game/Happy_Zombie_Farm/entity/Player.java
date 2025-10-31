@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,4 +46,7 @@ public class Player {
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<House> houses = new HashSet<>();
+
+    @Column(name = "last_meat_update")
+    private Instant lastMeatUpdate;
 }
