@@ -12,11 +12,11 @@ type Mutation {
 
 type Query {
   getPlayer: Player!
-  
   getHouse(houseId: ID!): House
-  
   getPlayerHouses: [House!]!
-  
+
+  getHousesInfoCfg: Json!
+  getGameLogicCfg: Json!
 }
 
 input BuildHouseInput {
@@ -43,12 +43,10 @@ input HouseIdInput {
 
 input ConvertMeatToBrainInput {
   meatToSpend: Long!
-  expectedBrain: Long!
 }
 
 input ConvertBrainToGoldInput {
   brainToSpend: Long!
-  expectedGold: Long!
 }
 
 type RemoveHousePayload {
@@ -89,3 +87,4 @@ enum HouseType {
 
 scalar DateTime
 scalar Long
+scalar Json

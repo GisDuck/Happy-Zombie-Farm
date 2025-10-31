@@ -9,7 +9,7 @@ import game.Happy_Zombie_Farm.entity.House;
 import game.Happy_Zombie_Farm.entity.Player;
 import game.Happy_Zombie_Farm.enums.HouseType;
 import game.Happy_Zombie_Farm.exception.NoPlayerException;
-import game.Happy_Zombie_Farm.exception.NotEnoughGoldException;
+import game.Happy_Zombie_Farm.exception.ResourcesException;
 import game.Happy_Zombie_Farm.mapper.PlayerMapper;
 import game.Happy_Zombie_Farm.repository.HouseRepository;
 import game.Happy_Zombie_Farm.repository.PlayerRepository;
@@ -112,16 +112,16 @@ public class PlayerService {
     }
 
     @Transactional
-    public void takeMoney(Long gold, Player player) throws NotEnoughGoldException {
+    public void takeMoney(Long gold, Player player) throws ResourcesException {
         if (isEnoughGold(gold, player)) {
             player.setGold(player.getGold() - gold);
         } else {
-            throw new NotEnoughGoldException(player.getId(), gold);
+            throw new ResourcesException("NotEnough gold id=" + player.getId() + "gold=" + gold);
         }
     }
 
     @Transactional
-    public void takeMoney(Long gold, Long playerId) throws NotEnoughGoldException, NoPlayerException {
+    public void takeMoney(Long gold, Long playerId) throws ResourcesException, NoPlayerException {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new NoPlayerException(playerId));
 
@@ -129,16 +129,12 @@ public class PlayerService {
     }
 
     @Transactional
-    public void returnMoney(Long gold, Player player) throws NotEnoughGoldException {
-        if (isEnoughGold(gold, player)) {
-            player.setGold(player.getGold() + gold);
-        } else {
-            throw new NotEnoughGoldException(player.getId(), gold);
-        }
+    public void returnMoney(Long gold, Player player) {
+        player.setGold(player.getGold() + gold);
     }
 
     @Transactional
-    public void returnMoney(Long gold, Long playerId) throws NotEnoughGoldException, NoPlayerException {
+    public void returnMoney(Long gold, Long playerId) throws NoPlayerException {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new NoPlayerException(playerId));
 
@@ -149,28 +145,18 @@ public class PlayerService {
     public PlayerDto convertMeatToBrain(Player player, ConvertMeatToBrainInputDto input) {
         long rate = gameLogicCfg.conversion().meatPerOneBrain();
         long meatToSpend = input.meatToSpend();
-        long expectedBrain = input.expectedBrain();
 
         updatePlayerMeat(player);
 
-        // 1) хватает ли мяса
         if (meatToSpend <= 0) {
-            throw new RuntimeException("meatToSpend must be > 0");
+            throw new ResourcesException("meatToSpend must be > 0");
         }
         if (player.getMeat() < meatToSpend) {
-            throw new RuntimeException("Not enough meat");
+            throw new ResourcesException("Not enough meat");
         }
 
-        // 2) считаем, сколько должны выдать
         long actualBrain = meatToSpend / rate;
 
-        // 3) сравниваем с тем, что хочет клиент
-        if (actualBrain != expectedBrain) {
-            throw new RuntimeException("Conversion mismatch: client expected " + expectedBrain +
-                    " but actual is " + actualBrain);
-        }
-
-        // 4) применяем
         player.setMeat(player.getMeat() - meatToSpend);
         player.setBrain(player.getBrain() + actualBrain);
 
@@ -190,21 +176,15 @@ public class PlayerService {
     public PlayerDto convertBrainToGold(Player player, ConvertBrainToGoldInputDto input) {
         long rate = gameLogicCfg.conversion().brainPerOneCoin();
         long brainToSpend = input.brainToSpend();
-        long expectedGold = input.expectedGold();
 
         if (brainToSpend <= 0) {
-            throw new RuntimeException("brainToSpend must be > 0");
+            throw new ResourcesException("brainToSpend must be > 0");
         }
         if (player.getBrain() < brainToSpend) {
-            throw new RuntimeException("Not enough brain");
+            throw new ResourcesException("Not enough brain");
         }
 
         long actualGold = brainToSpend / rate;
-
-        if (actualGold != expectedGold) {
-            throw new RuntimeException("Conversion mismatch: client expected " + expectedGold +
-                    " but actual is " + actualGold);
-        }
 
         player.setBrain(player.getBrain() - brainToSpend);
         player.setGold(player.getGold() + actualGold);

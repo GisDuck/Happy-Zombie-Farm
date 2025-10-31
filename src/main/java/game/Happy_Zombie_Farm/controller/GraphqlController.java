@@ -1,5 +1,7 @@
 package game.Happy_Zombie_Farm.controller;
 
+import game.Happy_Zombie_Farm.config.GameLogicCfg;
+import game.Happy_Zombie_Farm.config.HousesInfoCfg;
 import game.Happy_Zombie_Farm.dto.HouseDto;
 import game.Happy_Zombie_Farm.dto.PlayerDto;
 import game.Happy_Zombie_Farm.dto.inputDto.*;
@@ -25,6 +27,10 @@ public class GraphqlController {
     private HouseService houseService;
     @Autowired
     private PlayerMapper playerMapper;
+    @Autowired
+    private GameLogicCfg gameLogicCfg;
+    @Autowired
+    private HousesInfoCfg housesInfoCfg;
 
     // ---- Queries ----
     @QueryMapping
@@ -40,6 +46,16 @@ public class GraphqlController {
     @QueryMapping
     public List<HouseDto> getPlayerHouses(@AuthenticationPrincipal(expression = "playerId") Long playerId) {
         return houseService.getPlayerHousesDto(playerId);
+    }
+
+    @QueryMapping
+    public GameLogicCfg getGameLogicCfg() {
+        return gameLogicCfg;
+    }
+
+    @QueryMapping
+    public HousesInfoCfg getHousesInfoCfg() {
+        return housesInfoCfg;
     }
 
     // ---- Mutations ----
