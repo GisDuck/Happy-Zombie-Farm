@@ -81,11 +81,5 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
-security:
-  jwt:
-    secret: ${JWT_SECRET}
-    access-expiration-ms: 900000     # 15 минут
-    refresh-expiration-ms: 1209600000 # 14 дней
-
 
 
