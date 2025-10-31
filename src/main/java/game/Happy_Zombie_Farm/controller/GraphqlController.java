@@ -28,7 +28,7 @@ public class GraphqlController {
 
     // ---- Queries ----
     @QueryMapping
-    public PlayerDto getPlayer(@AuthenticationPrincipal(expression = "id") Long playerId) {
+    public PlayerDto getPlayer(@AuthenticationPrincipal(expression = "player_id") Long playerId) {
         return playerService.getCurrentPlayerDto(playerId);
     }
 
@@ -38,37 +38,37 @@ public class GraphqlController {
     }
 
     @QueryMapping
-    public List<HouseDto> getPlayerHouses(@AuthenticationPrincipal(expression = "id") Long playerId) {
+    public List<HouseDto> getPlayerHouses(@AuthenticationPrincipal(expression = "player_id") Long playerId) {
         return houseService.getPlayerHousesDto(playerId);
     }
 
     // ---- Mutations ----
     @MutationMapping
-    public HouseDto buildHouse(@AuthenticationPrincipal(expression = "id") Long playerId,
+    public HouseDto buildHouse(@AuthenticationPrincipal(expression = "player_id") Long playerId,
                                @Argument BuildHouseInputDto input) {
         return houseService.buildHouse(playerId, input);
     }
 
     @MutationMapping
-    public HouseDto updateHouseSkin(@AuthenticationPrincipal(expression = "id") Long playerId,
+    public HouseDto updateHouseSkin(@AuthenticationPrincipal(expression = "player_id") Long playerId,
                                     @Argument UpdateHouseSkinInputDto input) {
         return houseService.updateHouseSkin(playerId, input);
     }
 
     @MutationMapping
-    public HouseDto updateHouseLocation(@AuthenticationPrincipal(expression = "id") Long playerId,
+    public HouseDto updateHouseLocation(@AuthenticationPrincipal(expression = "player_id") Long playerId,
                                         @Argument UpdateHouseLocationInputDto input) {
         return houseService.updateHouseLocation(playerId, input);
     }
 
     @MutationMapping
-    public HouseDto updateHouseLevel(@AuthenticationPrincipal(expression = "id") Long playerId,
+    public HouseDto updateHouseLevel(@AuthenticationPrincipal(expression = "player_id") Long playerId,
                                      @Argument HouseIdInputDto input) {
         return houseService.updateHouseLevel(playerId, input);
     }
 
     @MutationMapping
-    public RemoveHousePayloadDto removeHouse(@AuthenticationPrincipal(expression = "id") Long playerId,
+    public RemoveHousePayloadDto removeHouse(@AuthenticationPrincipal(expression = "player_id") Long playerId,
                                              @Argument HouseIdInputDto input) {
         return houseService.removeHouse(playerId, input);
     }
