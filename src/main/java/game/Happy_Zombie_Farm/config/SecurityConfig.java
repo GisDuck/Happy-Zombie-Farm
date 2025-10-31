@@ -27,7 +27,7 @@ public class SecurityConfig {
                         // REST логин можно
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(
-                                "/", "/index", "/public/**",
+                                "/", "/index", "/index.html",  "/public/**",
                                 "/css/**", "/js/**", "/images/**", "/favicon.ico"
                         ).permitAll()
                         .requestMatchers("/api/config/**").permitAll()
