@@ -1,6 +1,6 @@
 scalar DateTime
 scalar Long
-scalar Json
+scalar JSON
 
 type Mutation {
   buildHouse(input: BuildHouseInput!): House!
@@ -19,8 +19,8 @@ type Query {
   getHouse(houseId: ID!): House
   getPlayerHouses: [House!]!
 
-  getHousesInfoCfg: Json!
-  getGameLogicCfg: Json!
+  getHousesInfoCfg: JSON!
+  getGameLogicCfg: JSON!
 }
 
 input BuildHouseInput {
