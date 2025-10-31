@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-add-player-last-meat-update
+      author: GisDuck
+      changes:
+        - addColumn:
+            tableName: players
+            columns:
+              - column:
+                  name: last_meat_update
+                  type: timestamp with time zone
+                  remarks: "время последнего перерасчёта мяса"
+                  defaultValueComputed: CURRENT_TIMESTAMP

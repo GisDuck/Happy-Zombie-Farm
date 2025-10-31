@@ -23,16 +23,16 @@ public record HousesInfoCfg(
 
     @Validated
     public record LevelCfg(
-            @PositiveOrZero Long price,
-            @PositiveOrZero Long cows,
-            @PositiveOrZero Long maxBrain,
-            @PositiveOrZero Long maxMeat
+            @PositiveOrZero long price,
+            @PositiveOrZero long cows,
+            @PositiveOrZero long maxBrain,
+            @PositiveOrZero long maxMeat
     ) {}
 
     // Скин для FARM/STORAGE
     @Validated
     public record SkinCfg(
-            @PositiveOrZero Long price,
+            @PositiveOrZero long price,
             @Positive int width,
             @Positive int height
     ) {}

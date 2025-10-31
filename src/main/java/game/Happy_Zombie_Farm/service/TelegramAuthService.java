@@ -96,18 +96,21 @@ public class TelegramAuthService {
     @Transactional
     public Player registerTelegramUser(TelegramAuthDto telegramAuthDto) {
 
+        Instant now = Instant.now();
+
         Player player = new Player();
         player.setUsername(telegramAuthDto.username());
         player.setBoardColor(getRandomBoardColor());
         player.setMeat(0L);
         player.setGold(0L);
         player.setBrain(0L);
+        player.setLastMeatUpdate(now);
         player = playerRepository.save(player);
 
         UserAuth ua = new UserAuth();
         ua.setTelegramId(telegramAuthDto.id());
         ua.setPlayer(player);
-        ua.setCreatedAt(LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC));
+        ua.setCreatedAt(now);
         userAuthRepository.save(ua);
 
         return player;

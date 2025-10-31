@@ -1,13 +1,13 @@
 type Mutation {
   buildHouse(input: BuildHouseInput!): House!
-  
   updateHouseLevel(input: HouseIdInput!): House!
-  
   updateHouseSkin(input: UpdateHouseSkinInput!): House!
-  
   updateHouseLocation(input: UpdateHouseLocationInput!): House!
-  
   removeHouse(input: HouseIdInput!): RemoveHousePayload!
+  updatePlayerMeat: Player!
+
+  convertMeatToBrain(input: ConvertMeatToBrainInput!): Player!
+  convertBrainToGold(input: ConvertBrainToGoldInput!): Player!
 }
 
 type Query {
@@ -39,6 +39,16 @@ input UpdateHouseLocationInput {
 
 input HouseIdInput {
   houseId: ID!
+}
+
+input ConvertMeatToBrainInput {
+  meatToSpend: Long!
+  expectedBrain: Long!
+}
+
+input ConvertBrainToGoldInput {
+  brainToSpend: Long!
+  expectedGold: Long!
 }
 
 type RemoveHousePayload {
