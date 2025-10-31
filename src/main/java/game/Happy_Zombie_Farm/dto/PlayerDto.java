@@ -6,9 +6,9 @@ import java.util.List;
 public record PlayerDto(
         Long id,
         String username,
-        String meat,
-        String gold,
-        String brain,
+        Long meat,
+        Long gold,
+        Long brain,
         BoardColor boardColor,
         List<HouseDto> houses
 ) {}

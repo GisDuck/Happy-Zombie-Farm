@@ -49,9 +49,9 @@ type RemoveHousePayload {
 type Player {
   id: ID!
   username: String!
-  meat: String!
-  gold: String!
-  brain: String!
+  meat: Long!
+  gold: Long!
+  brain: Long!
   boardColor: BoardColor!
   houses: [House!]!
 }
@@ -78,3 +78,4 @@ enum HouseType {
 }
 
 scalar DateTime
+scalar Long
