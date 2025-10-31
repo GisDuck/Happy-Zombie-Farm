@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -21,6 +22,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -91,6 +93,7 @@ public class TelegramAuthService {
         }
     }
 
+    @Transactional
     public Player registerTelegramUser(TelegramAuthDto telegramAuthDto) {
 
         Player player = new Player();
@@ -104,7 +107,7 @@ public class TelegramAuthService {
         UserAuth ua = new UserAuth();
         ua.setTelegramId(telegramAuthDto.id());
         ua.setPlayer(player);
-        ua.setCreatedAt(LocalDateTime.from(Instant.now()));
+        ua.setCreatedAt(LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC));
         userAuthRepository.save(ua);
 
         return player;
