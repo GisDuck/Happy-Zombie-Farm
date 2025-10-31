@@ -1,44 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>hzfarm</title>
 </head>
 <body>
-hubabuba ПРивет с пары!
+Привет 👋
 
-
-<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="hzfarm_bot" data-size="large"
+<script async src="https://telegram.org/js/telegram-widget.js?22"
+        data-telegram-login="hzfarm_bot"
+        data-size="large"
         data-onauth="onTelegramAuth(user)"></script>
+
 <script>
-    function onTelegramAuth(user) {
-      console.log(user)
-      fetch("https://hzfarm.ru/auth/telegram-login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify(user),
-        credentials: "include"
-      })
-      .then(r => r.text())
-      .then(alert)
-      .catch(console.error);
+    const BASE_URL = "https://hzfarm.ru"; // если тестишь локально — поменяй
 
-      fetch("https://hzfarm.ru/api/config/houses-info", {
-        method: "GET"
-      })
-      .then(r => r.text())
-      .then(alert)
-      .catch(console.error);
+    async function onTelegramAuth(user) {
+      try {
+        // 1. авторизация
+        const authResp = await fetch(`${BASE_URL}/auth/telegram-login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify(user),
+          credentials: "include"
+        });
 
-      fetch("https://hzfarm.ru/api/config/game-logic", {
-        method: "GET"
-      })
-      .then(r => r.text())
-      .then(alert)
-      .catch(console.error);
+        // пробуем считать токен
+        let authBodyText = await authResp.text();
+        let token;
+        try {
+          const json = JSON.parse(authBodyText);
+          token = json.accessToken || json.access_token || json.token;
+        } catch (e) {
+          // значит бэк отдал просто строку
+          token = authBodyText;
+        }
+
+        if (!token) {
+          alert("Токен не пришёл от бэка: " + authBodyText);
+          return;
+        }
+
+        console.log("access token:", token);
+        localStorage.setItem("access_token", token);
+
+        // 2. запрос конфига (GraphQL)
+        const cfgResp = await fetch(`${BASE_URL}/graphql`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({
+            query: "{ getHousesInfoCfg getGameLogicCfg }"
+          })
+        });
+        const cfgJson = await cfgResp.json();
+        console.log("config:", cfgJson);
+        alert("config ok, смотри в консоли");
+
+        // 3. запрос на обновление мяса
+        const meatResp = await fetch(`${BASE_URL}/graphql`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({
+            query: "mutation { updatePlayerMeat { id username meat gold brain } }"
+          })
+        });
+        const meatJson = await meatResp.json();
+        console.log("updatePlayerMeat:", meatJson);
+        alert("meat обновлён, смотри в консоли");
+
+      } catch (err) {
+        console.error(err);
+        alert("Ошибка: " + err);
+      }
     }
 </script>
 
