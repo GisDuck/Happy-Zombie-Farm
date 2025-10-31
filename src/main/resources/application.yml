@@ -6,6 +6,9 @@ spring:
   application:
     name: Happy-Zombie-Farm
 
+  main:
+    web-application-type: servlet
+
   config:
     import: optional:file:.env[.properties]
 
