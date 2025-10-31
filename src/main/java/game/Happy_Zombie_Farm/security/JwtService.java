@@ -26,9 +26,9 @@ public class JwtService {
      */
     public String generateAccessToken(Long playerId, String username) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("player_id", playerId);
+        claims.put("playerId", playerId);
         claims.put("username", username);
-        claims.put("token_type", "access");
+        claims.put("tokenType", "access");
 
         Instant now = Instant.now();
         Instant exp = now.plusMillis(props.getAccessExpirationMs());
@@ -44,8 +44,8 @@ public class JwtService {
 
     public String generateRefreshToken(Long playerId) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("player_id", playerId);
-        claims.put("token_type", "refresh");
+        claims.put("playerId", playerId);
+        claims.put("tokenType", "refresh");
 
         Instant now = Instant.now();
         Instant exp = now.plusMillis(props.getRefreshExpirationMs());
@@ -83,7 +83,7 @@ public class JwtService {
 
     public boolean isRefreshToken(String token) {
         Claims claims = extractAllClaims(token);
-        String type = claims.get("token_type", String.class);
+        String type = claims.get("tokenType", String.class);
         return "refresh".equals(type);
     }
 
