@@ -7,7 +7,7 @@ public record HouseDto(
         Long playerId,
         HouseType type,
         Integer level,
-        Integer skin,
+        String skin,
         Integer locationX,
         Integer locationY
 ) {}

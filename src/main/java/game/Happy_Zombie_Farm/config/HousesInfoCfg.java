@@ -18,7 +18,7 @@ public record HousesInfoCfg(
             @PositiveOrZero int width,
             @PositiveOrZero int height,
             @NotEmpty Map<@Positive Integer, @NotNull LevelCfg> levels,
-            @NotEmpty Map<@Positive Integer, @NotNull SkinCfg> skins
+            @NotEmpty Map<@NotNull String, @NotNull SkinCfg> skins
     ) {}
 
     @Validated
