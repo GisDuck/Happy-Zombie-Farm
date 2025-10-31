@@ -28,7 +28,6 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                     // REST логин можно
                     .requestMatchers("/auth/**").permitAll()
-                    .requestMatchers("/api/config/**").permitAll()
                     // всё остальное — только с токеном
                     .anyRequest().authenticated()
             )
