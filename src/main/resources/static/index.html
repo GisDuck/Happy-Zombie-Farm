@@ -2,86 +2,253 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>hzfarm</title>
+    <title>hzfarm — тесты</title>
+    <style>
+        body {
+          font-family: sans-serif;
+          padding: 16px;
+          background: #0f172a;
+          color: #e2e8f0;
+        }
+        h1 { margin-top: 0; }
+        .row { margin-bottom: 10px; }
+        button {
+          margin: 4px 4px 4px 0;
+          padding: 6px 10px;
+          background: #1f2937;
+          border: 1px solid #334155;
+          border-radius: 4px;
+          color: #e2e8f0;
+          cursor: pointer;
+        }
+        button:hover { background: #334155; }
+        pre {
+          background: #020617;
+          padding: 8px;
+          border: 1px solid #1e293b;
+          border-radius: 4px;
+          max-height: 240px;
+          overflow: auto;
+          font-size: 12px;
+        }
+        .badge {
+          display: inline-block;
+          padding: 2px 6px;
+          font-size: 11px;
+          border-radius: 3px;
+          background: #e11d48;
+          color: #fff;
+          margin-left: 6px;
+        }
+    </style>
 </head>
 <body>
-Привет 👋
+<h1>hzfarm тестовая страница</h1>
 
-<script async src="https://telegram.org/js/telegram-widget.js?22"
-        data-telegram-login="hzfarm_bot"
-        data-size="large"
-        data-onauth="onTelegramAuth(user)"></script>
+<div class="row">
+    <!-- виджет телеги -->
+    <script async src="https://telegram.org/js/telegram-widget.js?22"
+            data-telegram-login="hzfarm_bot"
+            data-size="large"
+            data-onauth="onTelegramAuth(user)"></script>
+</div>
+
+<div class="row">
+    <strong>Текущий access из localStorage:</strong>
+    <span id="access-text">(нет)</span>
+    <button id="btn-clear">Очистить access</button>
+</div>
+
+<div class="row">
+    <strong>AUTH:</strong><br>
+    <button id="btn-refresh">/auth/refresh (получить новый access по cookie)</button>
+    <button id="btn-check-refresh">ПРОВЕРИТЬ refresh (ожидаем 200/401)</button>
+</div>
+
+<div class="row">
+    <strong>GraphQL:</strong><br>
+    <button id="btn-gql-player">getPlayer</button>
+    <button id="btn-gql-houses">getHousesInfoCfg</button>
+    <button id="btn-gql-logic">getGameLogicCfg</button>
+    <button id="btn-gql-meat">mutation updatePlayerMeat</button>
+</div>
+
+<div class="row">
+    <strong>Проверки:</strong><br>
+    <button id="btn-check-access">Проверить access (getPlayer)</button>
+    <button id="btn-reload">Перезагрузить страницу</button>
+</div>
+
+<div class="row">
+    <strong>Лог:</strong>
+    <pre id="log"></pre>
+</div>
 
 <script>
-    const BASE_URL = "https://hzfarm.ru"; // если тестишь локально — поменяй
+    // если деплой на сервер — будет https://hzfarm.ru
+    const BASE_URL = window.location.origin.startsWith("http")
+        ? window.location.origin
+        : "https://hzfarm.ru";
 
+    const ACCESS_KEY = "hzf_access_token";
+
+    // ===== utils =====
+    function log(...args) {
+      const el = document.getElementById("log");
+      const line = args.map(a => {
+        if (typeof a === "string") return a;
+        try { return JSON.stringify(a, null, 2); } catch (e) { return String(a); }
+      }).join(" ");
+      el.textContent = line + "\n" + el.textContent;
+      console.log(...args);
+    }
+
+    function setAccess(token) {
+      localStorage.setItem(ACCESS_KEY, token);
+      renderAccess();
+    }
+
+    function getAccess() {
+      return localStorage.getItem(ACCESS_KEY);
+    }
+
+    function renderAccess() {
+      const t = getAccess();
+      document.getElementById("access-text").textContent = t ? t : "(нет)";
+    }
+
+    // ===== телега авторизация =====
     async function onTelegramAuth(user) {
       try {
-        // 1. авторизация
-        const authResp = await fetch(`${BASE_URL}/auth/telegram-login`, {
+        log("telegram user:", user);
+        const resp = await fetch(`${BASE_URL}/auth/telegram-login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json"
           },
           body: JSON.stringify(user),
-          credentials: "include"
+          credentials: "include" // чтобы пришёл refresh в httpOnly cookie
         });
 
-        // пробуем считать токен
-        let authBodyText = await authResp.text();
-        let token;
-        try {
-          const json = JSON.parse(authBodyText);
-          token = json.accessToken || json.access_token || json.token;
-        } catch (e) {
-          // значит бэк отдал просто строку
-          token = authBodyText;
-        }
-
-        if (!token) {
-          alert("Токен не пришёл от бэка: " + authBodyText);
+        const text = await resp.text();
+        let json;
+        try { json = JSON.parse(text); } catch (e) {}
+        const access = json?.accessToken || json?.token || text;
+        if (!access) {
+          log("❌ авторизация: не получили access:", text);
+          alert("не получили access, смотри лог");
           return;
         }
 
-        console.log("access token:", token);
-        localStorage.setItem("access_token", token);
-
-        // 2. запрос конфига (GraphQL)
-        const cfgResp = await fetch(`${BASE_URL}/graphql`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + token
-          },
-          body: JSON.stringify({
-            query: "{ getHousesInfoCfg getGameLogicCfg }"
-          })
-        });
-        const cfgJson = await cfgResp.json();
-        console.log("config:", cfgJson);
-        alert("config ok, смотри в консоли");
-
-        // 3. запрос на обновление мяса
-        const meatResp = await fetch(`${BASE_URL}/graphql`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + token
-          },
-          body: JSON.stringify({
-            query: "mutation { updatePlayerMeat { id username meat gold brain } }"
-          })
-        });
-        const meatJson = await meatResp.json();
-        console.log("updatePlayerMeat:", meatJson);
-        alert("meat обновлён, смотри в консоли");
-
-      } catch (err) {
-        console.error(err);
-        alert("Ошибка: " + err);
+        setAccess(access);
+        log("✅ авторизация: получили access");
+      } catch (e) {
+        log("❌ ошибка авторизации:", e);
       }
     }
+
+    // ===== запросы =====
+    async function gqlFetch(query, variables = {}) {
+      const token = getAccess();
+      if (!token) {
+        log("❗ нет access в localStorage");
+        throw new Error("no access");
+      }
+      const resp = await fetch(`${BASE_URL}/graphql`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({ query, variables })
+      });
+      const json = await resp.json();
+      if (!resp.ok || json.errors) {
+        log("❌ GQL error:", json);
+        throw json;
+      }
+      return json;
+    }
+
+    // ===== кнопки =====
+    document.getElementById("btn-refresh").onclick = async () => {
+      try {
+        const resp = await fetch(`${BASE_URL}/auth/refresh`, {
+          method: "POST",
+          credentials: "include"
+        });
+        if (!resp.ok) {
+          log("❌ refresh вернул", resp.status);
+          return;
+        }
+        const data = await resp.json();
+        const access = data.accessToken;
+        setAccess(access);
+        log("✅ refresh: новый access получен");
+      } catch (e) {
+        log("❌ ошибка refresh:", e);
+      }
+    };
+
+    // просто проверить, жив ли refresh cookie
+    document.getElementById("btn-check-refresh").onclick = async () => {
+      const resp = await fetch(`${BASE_URL}/auth/refresh`, {
+        method: "POST",
+        credentials: "include"
+      });
+      log("check refresh → статус:", resp.status);
+      if (resp.ok) {
+        const data = await resp.json();
+        log("refresh можно использовать, пришёл access:", data.accessToken);
+      } else {
+        log("refresh НЕЛЬЗЯ использовать (нет куки / истёк)");
+      }
+    };
+
+    document.getElementById("btn-gql-player").onclick = async () => {
+      const data = await gqlFetch(`{ getPlayer { id username meat gold brain boardColor } }`);
+      log("getPlayer:", data);
+    };
+
+    document.getElementById("btn-gql-houses").onclick = async () => {
+      const data = await gqlFetch(`{ getHousesInfoCfg }`);
+      log("getHousesInfoCfg:", data);
+    };
+
+    document.getElementById("btn-gql-logic").onclick = async () => {
+      const data = await gqlFetch(`{ getGameLogicCfg }`);
+      log("getGameLogicCfg:", data);
+    };
+
+    document.getElementById("btn-gql-meat").onclick = async () => {
+      const data = await gqlFetch(`mutation { updatePlayerMeat { id username meat gold brain } }`);
+      log("updatePlayerMeat:", data);
+    };
+
+    // проверка access — просто делаем getPlayer
+    document.getElementById("btn-check-access").onclick = async () => {
+      try {
+        const data = await gqlFetch(`{ getPlayer { id } }`);
+        log("✅ access живой, getPlayer вернул:", data);
+      } catch (e) {
+        log("❌ access НЕ сработал:", e);
+      }
+    };
+
+    document.getElementById("btn-clear").onclick = () => {
+      localStorage.removeItem(ACCESS_KEY);
+      renderAccess();
+      log("localStorage access очищен");
+    };
+
+    document.getElementById("btn-reload").onclick = () => {
+      location.reload();
+    };
+
+    // ===== init =====
+    renderAccess();
+    log("Страница загружена. BASE_URL =", BASE_URL);
 </script>
 
 </body>
