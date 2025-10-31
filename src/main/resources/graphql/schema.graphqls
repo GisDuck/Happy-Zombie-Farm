@@ -58,7 +58,7 @@ type Player {
 
 type House {
   id: ID!
-  player: Player!
+  playerId: Long!
   type: HouseType!
   level: Int!
   skin: String!
