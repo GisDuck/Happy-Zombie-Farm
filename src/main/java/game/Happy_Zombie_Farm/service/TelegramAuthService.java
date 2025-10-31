@@ -91,7 +91,7 @@ public class TelegramAuthService {
         }
     }
 
-    public AuthPayloadDto registerTelegramUser(TelegramAuthDto telegramAuthDto) {
+    public Player registerTelegramUser(TelegramAuthDto telegramAuthDto) {
 
         Player player = new Player();
         player.setUsername(telegramAuthDto.username());
@@ -107,7 +107,7 @@ public class TelegramAuthService {
         ua.setCreatedAt(LocalDateTime.from(Instant.now()));
         userAuthRepository.save(ua);
 
-        return new AuthPayloadDto(playerMapper.toDto(player), "FAKE_TOKEN");
+        return player;
     }
 
     private static BoardColor getRandomBoardColor() {

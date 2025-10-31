@@ -29,7 +29,7 @@ public class GraphqlController {
     // ---- Queries ----
     @QueryMapping
     public PlayerDto getPlayer(@AuthenticationPrincipal(expression = "playerId") Long playerId) {
-        return playerService.getCurrentPlayerDto(playerId);
+        return playerService.getPlayerDto(playerId);
     }
 
     @QueryMapping
