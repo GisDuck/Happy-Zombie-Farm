@@ -26,38 +26,36 @@ public class JwtService {
      */
     public String generateAccessToken(Long playerId, String username) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("playerId", playerId);
+        claims.put("player_id", playerId);
         claims.put("username", username);
+        claims.put("token_type", "access");
 
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + props.getAccessExpirationMs());
+        Instant now = Instant.now();
+        Instant exp = now.plusMillis(props.getAccessExpirationMs());
 
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(playerId.toString())
-                .setIssuedAt(now)
-                .setExpiration(expiry)
-                .signWith(SignatureAlgorithm.HS256, props.getSecret())
+                .claims(claims)                // вместо setClaims(...)
+                .subject(String.valueOf(playerId))
+                .issuedAt(java.util.Date.from(now))
+                .expiration(java.util.Date.from(exp))
+                .signWith(getSignKey())
                 .compact();
     }
 
-    /**
-     * Генерим refresh-токен для конкретного игрока.
-     */
     public String generateRefreshToken(Long playerId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("player_id", playerId);
         claims.put("token_type", "refresh");
 
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + props.getRefreshExpirationMs());
+        Instant now = Instant.now();
+        Instant exp = now.plusMillis(props.getRefreshExpirationMs());
 
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(playerId.toString())
-                .setIssuedAt(now)
-                .setExpiration(expiry)
-                .signWith(SignatureAlgorithm.HS256, props.getSecret())
+                .claims(claims)
+                .subject(String.valueOf(playerId))
+                .issuedAt(java.util.Date.from(now))
+                .expiration(java.util.Date.from(exp))
+                .signWith(getSignKey())
                 .compact();
     }
 
