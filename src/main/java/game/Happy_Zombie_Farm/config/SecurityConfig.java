@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -21,24 +22,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        // REST логин можно
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(
-                                "/", "/index", "/index.html",  "/public/**",
-                                "/css/**", "/js/**", "/images/**", "/favicon.ico"
-                        ).permitAll()
-                        .requestMatchers("/api/config/**").permitAll()
-                        // всё остальное — только с токеном
-                        .anyRequest().authenticated()
-                )
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((req, res, e) -> res.sendRedirect("/"))
-                        .accessDeniedHandler((req, res, e) -> res.sendRedirect("/"))
-                )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                    // REST логин можно
+                    .requestMatchers("/auth/**").permitAll()
+                    .requestMatchers(
+                            "/", "/index", "/index.html",  "/public/**",
+                            "/css/**", "/js/**", "/images/**", "/favicon.ico"
+                    ).permitAll()
+                    .requestMatchers("/api/config/**").permitAll()
+                    // всё остальное — только с токеном
+                    .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
