@@ -6,9 +6,6 @@ spring:
   application:
     name: Happy-Zombie-Farm
 
-  main:
-    web-application-type: servlet
-
   config:
     import: optional:file:.env[.properties]
 
@@ -20,7 +17,7 @@ spring:
       path: /graphiql
 
   profiles:
-    default: houses-info, game-logic
+    default: houses-info, game-logic, security
 
   jackson:
     default-property-inclusion: non_null
@@ -80,6 +77,5 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-
 
 
