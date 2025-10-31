@@ -26,10 +26,17 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // REST логин можно
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/public/**", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers(
+                                "/", "/index", "/public/**",
+                                "/css/**", "/js/**", "/images/**", "/favicon.ico"
+                        ).permitAll()
                         .requestMatchers("/api/config/**").permitAll()
                         // всё остальное — только с токеном
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((req, res, e) -> res.sendRedirect("/"))
+                        .accessDeniedHandler((req, res, e) -> res.sendRedirect("/"))
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
