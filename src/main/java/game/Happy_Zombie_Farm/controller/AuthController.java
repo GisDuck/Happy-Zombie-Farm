@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -55,6 +56,7 @@ public class AuthController {
      * сюда отправляются данные, полученные после аутентификации
      */
     @PostMapping("/telegram-login")
+    @Transactional
     public ResponseEntity<AuthPayloadDto> login(@RequestBody TelegramAuthDto telegramAuthDto,
                                                HttpServletResponse response) {
         if (telegramAuthService.telegramDataIsValid(telegramAuthDto)) {

@@ -3,6 +3,8 @@ package game.Happy_Zombie_Farm.entity;
 import game.Happy_Zombie_Farm.enums.HouseType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 @Entity
 @Table(name = "houses")
@@ -22,6 +24,7 @@ public class House {
     private Player player;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(nullable = false)
     private HouseType type;
 
