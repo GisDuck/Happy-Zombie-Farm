@@ -3,6 +3,8 @@ package game.Happy_Zombie_Farm.entity;
 import game.Happy_Zombie_Farm.enums.BoardColor;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,7 +35,8 @@ public class Player {
     private Long brain;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "board_color")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(name = "board_color", columnDefinition = "board_color")
     private BoardColor boardColor;
 
     @OneToOne(mappedBy = "player", fetch = FetchType.LAZY)
