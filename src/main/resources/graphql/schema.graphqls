@@ -1,0 +1,80 @@
+type Mutation {
+  buildHouse(input: BuildHouseInput!): House!
+  
+  updateHouseLevel(input: HouseIdInput!): House!
+  
+  updateHouseSkin(input: UpdateHouseSkinInput!): House!
+  
+  updateHouseLocation(input: UpdateHouseLocationInput!): House!
+  
+  removeHouse(input: HouseIdInput!): RemoveHousePayload!
+}
+
+type Query {
+  getPlayer: Player!
+  
+  getHouse(houseId: ID!): House
+  
+  getPlayerHouses: [House!]!
+  
+}
+
+input BuildHouseInput {
+  type: HouseType!
+  skin: Int!
+  locationX: Int!
+  locationY: Int!
+}
+
+input UpdateHouseSkinInput {
+  houseId: ID!
+  newSkin: Int!
+}
+
+input UpdateHouseLocationInput {
+  houseId: ID!
+  newLocationX: Int!
+  newLocationY: Int!
+}
+
+input HouseIdInput {
+  houseId: ID!
+}
+
+type RemoveHousePayload {
+  success: Boolean!
+  deletedHouseId: ID!
+}
+
+type Player {
+  id: ID!
+  username: String!
+  meat: String!
+  gold: String!
+  brain: String!
+  boardColor: BoardColor!
+  houses: [House!]!
+}
+
+type House {
+  id: ID!
+  player: Player!
+  type: HouseType!
+  level: Int!
+  skin: String!
+  locationX: Int!
+  locationY: Int!
+}
+
+enum BoardColor {
+  ORANGE
+  GREEN
+}
+
+enum HouseType {
+  FARM
+  DECOR
+  STORAGE
+}
+
+scalar DateTime

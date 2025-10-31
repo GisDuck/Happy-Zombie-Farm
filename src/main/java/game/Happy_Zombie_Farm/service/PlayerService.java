@@ -1,8 +1,11 @@
 package game.Happy_Zombie_Farm.service;
 
+import game.Happy_Zombie_Farm.dto.PlayerDto;
 import game.Happy_Zombie_Farm.entity.Player;
+import game.Happy_Zombie_Farm.exception.NoHouseException;
 import game.Happy_Zombie_Farm.exception.NoPlayerException;
 import game.Happy_Zombie_Farm.exception.NotEnoughGoldException;
+import game.Happy_Zombie_Farm.mapper.PlayerMapper;
 import game.Happy_Zombie_Farm.repository.HouseRepository;
 import game.Happy_Zombie_Farm.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,14 @@ public class PlayerService {
     private HouseRepository houseRepository;
     @Autowired
     private PlayerRepository playerRepository;
+    @Autowired
+    private PlayerMapper playerMapper;
+
+    public PlayerDto getCurrentPlayerDto(Long playerId) {
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new NoPlayerException(playerId));
+        return playerMapper.toDto(player);
+    }
 
     public boolean isEnoughGold(Long gold, Player player) throws NoPlayerException {
         if (player == null) {

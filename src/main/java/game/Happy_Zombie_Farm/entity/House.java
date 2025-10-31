@@ -35,5 +35,5 @@ public class House {
     private Integer locationY;
 
     @Column(nullable = false)
-    private Integer skin;
+    private String skin;
 }

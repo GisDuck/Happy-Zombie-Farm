@@ -9,6 +9,13 @@ spring:
   config:
     import: optional:file:.env[.properties]
 
+  graphql:
+    schema:
+      locations: classpath:graphql/
+    graphiql:
+      enabled: true
+      path: /graphiql
+
   profiles:
     default: houses-info, game-logic
 

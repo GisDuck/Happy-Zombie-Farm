@@ -41,6 +41,6 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: skin
-                  type: int
+                  type: varchar(50)
                   constraints:
                     nullable: true

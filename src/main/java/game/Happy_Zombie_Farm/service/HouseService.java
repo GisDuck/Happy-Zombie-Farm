@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class HouseService {
     @Autowired
@@ -32,10 +35,21 @@ public class HouseService {
     @Autowired
     private GameLogicCfg gameLogicCfg;
 
-    @Transactional
-    public HouseDto buildHouse(BuildHouseInputDto input) throws NoPlayerException {
-        Long playerId = 0L; //!!!ДОСТАТЬ ИЗ СЕКЬЮРИТИ!!!
+    public HouseDto getHouseDtoById(Long houseId) {
+        House house = houseRepository.findById(houseId)
+                .orElseThrow(() -> new NoHouseException(houseId));
+        return houseMapper.toDto(house);
+    }
 
+    public List<HouseDto> getPlayerHousesDto(Long playerId) {
+        List<House> houses = houseRepository.findByPlayerId(playerId);
+        return houses.stream()
+            .map(houseMapper::toDto)
+            .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public HouseDto buildHouse(Long playerId, BuildHouseInputDto input) throws NoPlayerException {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new NoPlayerException(playerId));
 
@@ -61,12 +75,10 @@ public class HouseService {
     }
 
     @Transactional
-    public HouseDto updateHouseLevel(HouseIdInputDto input)
+    public HouseDto updateHouseLevel(Long playerId, HouseIdInputDto input)
             throws NoHouseException,
             NotThisPlayerHouseIdException
     {
-        Long playerId = 0L; //!!!ДОСТАТЬ ИЗ СЕКЬЮРИТИ!!!
-
         House house = houseRepository.findById(input.houseId())
                 .orElseThrow(() -> new NoHouseException(input.houseId()));
 
@@ -91,12 +103,10 @@ public class HouseService {
     }
 
     @Transactional
-    public HouseDto updateHouseSkin(UpdateHouseSkinInputDto input)
+    public HouseDto updateHouseSkin(Long playerId, UpdateHouseSkinInputDto input)
             throws NoHouseException,
             NotThisPlayerHouseIdException
     {
-        Long playerId = 0L; //!!!ДОСТАТЬ ИЗ СЕКЬЮРИТИ!!!
-
         House house = houseRepository.findById(input.houseId())
                 .orElseThrow(() -> new NoHouseException(input.houseId()));
 
@@ -121,12 +131,10 @@ public class HouseService {
     }
 
     @Transactional
-    public HouseDto updateHouseLocation(UpdateHouseLocationInputDto input)
+    public HouseDto updateHouseLocation(Long playerId, UpdateHouseLocationInputDto input)
             throws NoHouseException,
             NotThisPlayerHouseIdException
     {
-        Long playerId = 0L; //!!!ДОСТАТЬ ИЗ СЕКЬЮРИТИ!!!
-
         House house = houseRepository.findById(input.houseId())
                 .orElseThrow(() -> new NoHouseException(input.houseId()));
 
@@ -143,9 +151,7 @@ public class HouseService {
     }
 
     @Transactional
-    public RemoveHousePayloadDto deleteHouse(HouseIdInputDto input) throws NoHouseException {
-        Long playerId = 0L; //!!!ДОСТАТЬ ИЗ СЕКЬЮРИТИ!!!
-
+    public RemoveHousePayloadDto removeHouse(Long playerId, HouseIdInputDto input) throws NoHouseException {
         House house = houseRepository.findById(input.houseId())
                 .orElseThrow(() -> new NoHouseException(input.houseId()));
 
