@@ -63,6 +63,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
         // тут укажи всё, что должно быть общедоступно (логин, хелсчеки и т.п.)
-        return path.startsWith("/auth/telegram");
+        return path.startsWith("/auth/")
+                || path.equals("/")
+                || path.equals("/index")
+                || path.equals("/index.html")
+                || path.startsWith("/public/")
+                || path.startsWith("/css/")
+                || path.startsWith("/js/")
+                || path.startsWith("/images/")
+                || path.equals("/favicon.ico")
+                || path.equals("/error");
+        }
     }
 }
