@@ -9,7 +9,7 @@ public class IndexController {
     // корень сайта и /index → индекс
     @GetMapping({"/", "/index"})
     public String index() {
-        return "forward:/public/index.html";
+        return "forward:/index.html";
     }
 
 //    // fallback для «левых» урлов типа /profile, /map и т.п.,
