@@ -74,5 +74,5 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 || path.equals("/favicon.ico")
                 || path.equals("/error");
         }
-    }
+
 }
