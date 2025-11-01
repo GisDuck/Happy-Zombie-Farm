@@ -83,6 +83,12 @@
 
 <div class="card">
     <div class="row">
+        <label for="baseUrl">BASE URL (сохр. в localStorage):</label><br />
+        <input id="baseUrl" type="text" value="" style="width: 260px" />
+        <button id="btn-save-base">Сохранить</button>
+        <span class="small">например: https://hzfarm.ru или http://localhost:8080</span>
+    </div>
+    <div class="row">
         <strong>access:</strong> <span id="access-text">(нет)</span>
         <button id="btn-clear-access">Очистить</button>
         <button id="btn-check-access">Проверить access (getPlayer)</button>
