@@ -11,7 +11,7 @@
           color: #e2e8f0;
         }
         h1 { margin-top: 0; }
-        .row { margin-bottom: 10px; }
+        .row { margin-bottom: 14px; }
         button {
           margin: 4px 4px 4px 0;
           padding: 6px 10px;
@@ -27,18 +27,32 @@
           padding: 8px;
           border: 1px solid #1e293b;
           border-radius: 4px;
-          max-height: 240px;
+          max-height: 260px;
           overflow: auto;
           font-size: 12px;
         }
-        .badge {
+        label {
           display: inline-block;
-          padding: 2px 6px;
-          font-size: 11px;
-          border-radius: 3px;
-          background: #e11d48;
-          color: #fff;
-          margin-left: 6px;
+          margin-right: 8px;
+          margin-bottom: 4px;
+        }
+        input, select {
+          background: #020617;
+          border: 1px solid #1e293b;
+          border-radius: 4px;
+          padding: 4px 6px;
+          color: #e2e8f0;
+          margin-right: 4px;
+          margin-bottom: 4px;
+        }
+        fieldset {
+          border: 1px solid #1e293b;
+          border-radius: 6px;
+          padding: 10px;
+        }
+        legend {
+          font-size: 13px;
+          color: #94a3b8;
         }
     </style>
 </head>
@@ -62,21 +76,97 @@
 <div class="row">
     <strong>AUTH:</strong><br>
     <button id="btn-refresh">/auth/refresh (получить новый access по cookie)</button>
-    <button id="btn-check-refresh">ПРОВЕРИТЬ refresh (ожидаем 200/401)</button>
+    <button id="btn-check-refresh">ПРОВЕРИТЬ refresh</button>
 </div>
 
 <div class="row">
-    <strong>GraphQL:</strong><br>
+    <strong>GraphQL базовые:</strong><br>
     <button id="btn-gql-player">getPlayer</button>
     <button id="btn-gql-houses">getHousesInfoCfg</button>
     <button id="btn-gql-logic">getGameLogicCfg</button>
-    <button id="btn-gql-meat">mutation updatePlayerMeat</button>
+    <button id="btn-gql-meat">updatePlayerMeat</button>
+    <button id="btn-check-access">Проверить access (getPlayer)</button>
+    <button id="btn-reload">Перезагрузить страницу</button>
 </div>
 
 <div class="row">
-    <strong>Проверки:</strong><br>
-    <button id="btn-check-access">Проверить access (getPlayer)</button>
-    <button id="btn-reload">Перезагрузить страницу</button>
+    <fieldset>
+        <legend>Дома</legend>
+        <div>
+            <button id="btn-load-houses">Обновить список домов</button>
+            <select id="sel-house">
+                <option value="">(нет данных)</option>
+            </select>
+        </div>
+
+        <div style="margin-top:6px;">
+            <strong>Построить дом</strong><br>
+            <label>Тип:
+                <select id="build-type">
+                    <option value="FARM">FARM</option>
+                    <option value="STORAGE">STORAGE</option>
+                    <option value="DECOR">DECOR</option>
+                </select>
+            </label>
+            <label>Skin:
+                <input id="build-skin" type="number" value="1" style="width:70px;">
+            </label>
+            <label>X:
+                <input id="build-x" type="number" value="0" style="width:70px;">
+            </label>
+            <label>Y:
+                <input id="build-y" type="number" value="0" style="width:70px;">
+            </label>
+            <button id="btn-build">buildHouse</button>
+        </div>
+
+        <div style="margin-top:6px;">
+            <strong>Изменить локацию</strong><br>
+            <label>X:
+                <input id="move-x" type="number" value="1" style="width:70px;">
+            </label>
+            <label>Y:
+                <input id="move-y" type="number" value="1" style="width:70px;">
+            </label>
+            <button id="btn-move">updateHouseLocation</button>
+        </div>
+
+        <div style="margin-top:6px;">
+            <strong>Изменить скин</strong><br>
+            <label>newSkin:
+                <input id="skin-new" type="number" value="2" style="width:70px;">
+            </label>
+            <button id="btn-change-skin">updateHouseSkin</button>
+        </div>
+
+        <div style="margin-top:6px;">
+            <strong>Повысить уровень</strong><br>
+            <button id="btn-upgrade">updateHouseLevel</button>
+        </div>
+
+        <div style="margin-top:6px;">
+            <strong>Удалить дом</strong><br>
+            <button id="btn-delete">removeHouse</button>
+        </div>
+    </fieldset>
+</div>
+
+<div class="row">
+    <fieldset>
+        <legend>Конвертации</legend>
+        <div>
+            <label>Meat → Brain:
+                <input id="conv-meat" type="number" value="10" style="width:90px;">
+            </label>
+            <button id="btn-conv-meat">convertMeatToBrain</button>
+        </div>
+        <div style="margin-top:6px;">
+            <label>Brain → Gold:
+                <input id="conv-brain" type="number" value="5" style="width:90px;">
+            </label>
+            <button id="btn-conv-brain">convertBrainToGold</button>
+        </div>
+    </fieldset>
 </div>
 
 <div class="row">
@@ -85,14 +175,13 @@
 </div>
 
 <script>
-    // если деплой на сервер — будет https://hzfarm.ru
     const BASE_URL = window.location.origin.startsWith("http")
         ? window.location.origin
         : "https://hzfarm.ru";
 
     const ACCESS_KEY = "hzf_access_token";
+    let currentHouses = [];
 
-    // ===== utils =====
     function log(...args) {
       const el = document.getElementById("log");
       const line = args.map(a => {
@@ -117,7 +206,6 @@
       document.getElementById("access-text").textContent = t ? t : "(нет)";
     }
 
-    // ===== телега авторизация =====
     async function onTelegramAuth(user) {
       try {
         log("telegram user:", user);
@@ -128,7 +216,7 @@
             "Accept": "application/json"
           },
           body: JSON.stringify(user),
-          credentials: "include" // чтобы пришёл refresh в httpOnly cookie
+          credentials: "include"
         });
 
         const text = await resp.text();
@@ -140,7 +228,6 @@
           alert("не получили access, смотри лог");
           return;
         }
-
         setAccess(access);
         log("✅ авторизация: получили access");
       } catch (e) {
@@ -148,7 +235,6 @@
       }
     }
 
-    // ===== запросы =====
     async function gqlFetch(query, variables = {}) {
       const token = getAccess();
       if (!token) {
@@ -171,7 +257,27 @@
       return json;
     }
 
+    function fillHousesSelect() {
+      const sel = document.getElementById("sel-house");
+      sel.innerHTML = "";
+      if (!currentHouses.length) {
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "(нет домов)";
+        sel.appendChild(opt);
+        return;
+      }
+      currentHouses.forEach(h => {
+        const opt = document.createElement("option");
+        opt.value = h.id;
+        opt.textContent = `${h.id} — ${h.type} (lvl ${h.level}) [${h.locationX},${h.locationY}]`;
+        sel.appendChild(opt);
+      });
+    }
+
     // ===== кнопки =====
+
+    // refresh
     document.getElementById("btn-refresh").onclick = async () => {
       try {
         const resp = await fetch(`${BASE_URL}/auth/refresh`, {
@@ -191,7 +297,7 @@
       }
     };
 
-    // просто проверить, жив ли refresh cookie
+    // check refresh
     document.getElementById("btn-check-refresh").onclick = async () => {
       const resp = await fetch(`${BASE_URL}/auth/refresh`, {
         method: "POST",
@@ -206,8 +312,9 @@
       }
     };
 
+    // базовые gql
     document.getElementById("btn-gql-player").onclick = async () => {
-      const data = await gqlFetch(`{ getPlayer { id username meat gold brain boardColor } }`);
+      const data = await gqlFetch(`{ getPlayer { id username meat gold brain boardColor houses { id type level locationX locationY skin } } }`);
       log("getPlayer:", data);
     };
 
@@ -226,13 +333,12 @@
       log("updatePlayerMeat:", data);
     };
 
-    // проверка access — просто делаем getPlayer
     document.getElementById("btn-check-access").onclick = async () => {
       try {
         const data = await gqlFetch(`{ getPlayer { id } }`);
-        log("✅ access живой, getPlayer вернул:", data);
+        log("✅ access живой:", data);
       } catch (e) {
-        log("❌ access НЕ сработал:", e);
+        log("❌ access не работает:", e);
       }
     };
 
@@ -242,11 +348,146 @@
       log("localStorage access очищен");
     };
 
-    document.getElementById("btn-reload").onclick = () => {
-      location.reload();
+    document.getElementById("btn-reload").onclick = () => location.reload();
+
+    // загрузить список домов
+    document.getElementById("btn-load-houses").onclick = async () => {
+      const data = await gqlFetch(`{ getPlayer { houses { id type level locationX locationY skin } } }`);
+      currentHouses = data.data.getPlayer.houses || [];
+      fillHousesSelect();
+      log("Список домов обновлён:", currentHouses);
     };
 
-    // ===== init =====
+    // build house
+    document.getElementById("btn-build").onclick = async () => {
+      const type = document.getElementById("build-type").value;
+      const skin = Number(document.getElementById("build-skin").value || 1);
+      const x = Number(document.getElementById("build-x").value || 0);
+      const y = Number(document.getElementById("build-y").value || 0);
+      const q = `
+        mutation($input: BuildHouseInput!) {
+          buildHouse(input: $input) {
+            id type level skin locationX locationY
+          }
+        }
+      `;
+      const vars = {
+        input: {
+          type,
+          skin,
+          locationX: x,
+          locationY: y
+        }
+      };
+      const data = await gqlFetch(q, vars);
+      log("buildHouse:", data);
+      // сразу обновим список домов
+      document.getElementById("btn-load-houses").click();
+    };
+
+    // move house
+    document.getElementById("btn-move").onclick = async () => {
+      const sel = document.getElementById("sel-house");
+      const houseId = sel.value;
+      if (!houseId) { log("❗ выбери дом"); return; }
+      const x = Number(document.getElementById("move-x").value || 0);
+      const y = Number(document.getElementById("move-y").value || 0);
+      const q = `
+        mutation($input: UpdateHouseLocationInput!) {
+          updateHouseLocation(input: $input) {
+            id locationX locationY
+          }
+        }
+      `;
+      const vars = { input: { houseId, newLocationX: x, newLocationY: y } };
+      const data = await gqlFetch(q, vars);
+      log("updateHouseLocation:", data);
+      document.getElementById("btn-load-houses").click();
+    };
+
+    // change skin
+    document.getElementById("btn-change-skin").onclick = async () => {
+      const sel = document.getElementById("sel-house");
+      const houseId = sel.value;
+      if (!houseId) { log("❗ выбери дом"); return; }
+      const newSkin = Number(document.getElementById("skin-new").value || 1);
+      const q = `
+        mutation($input: UpdateHouseSkinInput!) {
+          updateHouseSkin(input: $input) {
+            id skin
+          }
+        }
+      `;
+      const vars = { input: { houseId, newSkin } };
+      const data = await gqlFetch(q, vars);
+      log("updateHouseSkin:", data);
+      document.getElementById("btn-load-houses").click();
+    };
+
+    // upgrade level
+    document.getElementById("btn-upgrade").onclick = async () => {
+      const sel = document.getElementById("sel-house");
+      const houseId = sel.value;
+      if (!houseId) { log("❗ выбери дом"); return; }
+      const q = `
+        mutation($input: HouseIdInput!) {
+          updateHouseLevel(input: $input) {
+            id level
+          }
+        }
+      `;
+      const data = await gqlFetch(q, { input: { houseId } });
+      log("updateHouseLevel:", data);
+      document.getElementById("btn-load-houses").click();
+    };
+
+    // delete house
+    document.getElementById("btn-delete").onclick = async () => {
+      const sel = document.getElementById("sel-house");
+      const houseId = sel.value;
+      if (!houseId) { log("❗ выбери дом"); return; }
+      const q = `
+        mutation($input: HouseIdInput!) {
+          removeHouse(input: $input) {
+            success
+            deletedHouseId
+          }
+        }
+      `;
+      const data = await gqlFetch(q, { input: { houseId } });
+      log("removeHouse:", data);
+      document.getElementById("btn-load-houses").click();
+    };
+
+    // convert meat -> brain
+    document.getElementById("btn-conv-meat").onclick = async () => {
+      const amount = Number(document.getElementById("conv-meat").value || 0);
+      const q = `
+        mutation($input: ConvertMeatToBrainInput!) {
+          convertMeatToBrain(input: $input) {
+            id meat brain gold
+          }
+        }
+      `;
+      const data = await gqlFetch(q, { input: { meatToSpend: amount } });
+      log("convertMeatToBrain:", data);
+    };
+
+    // convert brain -> gold
+    document.getElementById("btn-conv-brain").onclick = async () => {
+      const amount = Number(document.getElementById("conv-brain").value || 0);
+      const q = `
+        mutation($input: ConvertBrainToGoldInput!) {
+          convertBrainToGold(input: $input) {
+            id brain gold meat
+          }
+        }
+      `;
+      const data = await gqlFetch(q, { input: { brainToSpend: amount } });
+      log("convertBrainToGold:", data);
+    };
+
+    // init
     renderAccess();
     log("Страница загружена. BASE_URL =", BASE_URL);
 </script>
