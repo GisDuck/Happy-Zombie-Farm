@@ -25,14 +25,14 @@ type Query {
 
 input BuildHouseInput {
   type: HouseType!
-  skin: Int!
+  skin: String!
   locationX: Int!
   locationY: Int!
 }
 
 input UpdateHouseSkinInput {
   houseId: ID!
-  newSkin: Int!
+  newSkin: String!
 }
 
 input UpdateHouseLocationInput {
