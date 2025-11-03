@@ -68,7 +68,7 @@ public class PlayerService {
                 .mapToLong(
                     h -> housesInfoCfg
                     .type()
-                    .get("FARM")
+                    .get(HouseType.FARM)
                     .levels()
                     .get(h.getLevel())
                     .cows()
@@ -79,7 +79,7 @@ public class PlayerService {
                 .mapToLong(
                     h -> housesInfoCfg
                     .type()
-                    .get("STORAGE")
+                    .get(HouseType.STORAGE)
                     .levels()
                     .get(h.getLevel())
                     .maxMeat()
@@ -98,26 +98,17 @@ public class PlayerService {
         return playerRepository.save(player);
     }
 
-    public boolean isEnoughGold(Long gold, Player player) throws NoPlayerException {
-        if (player == null) {
-            throw new NoPlayerException("player is null");
-        }
-        return player.getGold() >= gold;
-    }
-
-    public boolean isEnoughGold(Long gold, Long playerId) throws NoPlayerException {
-        Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new NoPlayerException(playerId));
-        return isEnoughGold(gold, player);
-    }
-
     @Transactional
     public void takeMoney(Long gold, Player player) throws ResourcesException {
-        if (isEnoughGold(gold, player)) {
-            player.setGold(player.getGold() - gold);
-        } else {
-            throw new ResourcesException("NotEnough gold id=" + player.getId() + "gold=" + gold);
+        if (gold <= 0) {
+            throw new ResourcesException("Gold must be positive for take");
         }
+        if (player.getGold() >= gold) {
+            updatePlayerMeat(player);
+            player.setGold(player.getGold() - gold);
+            return;
+        }
+        throw new ResourcesException("NotEnough gold id=" + player.getId() + "gold=" + gold);
     }
 
     @Transactional
@@ -130,6 +121,11 @@ public class PlayerService {
 
     @Transactional
     public void returnMoney(Long gold, Player player) {
+        if (gold <= 0) {
+            throw new ResourcesException("Gold must be positive for return");
+        }
+
+        updatePlayerMeat(player);
         player.setGold(player.getGold() + gold);
     }
 
@@ -176,6 +172,8 @@ public class PlayerService {
     public PlayerDto convertBrainToGold(Player player, ConvertBrainToGoldInputDto input) {
         long rate = gameLogicCfg.conversion().brainPerOneCoin();
         long brainToSpend = input.brainToSpend();
+
+        updatePlayerMeat(player);
 
         if (brainToSpend <= 0) {
             throw new ResourcesException("brainToSpend must be > 0");
