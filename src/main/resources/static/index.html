@@ -360,7 +360,7 @@
 
     // GQL базовые
     document.getElementById("btn-gql-player").onclick = async () => {
-      const data = await gqlFetch(`{ getPlayer { id username meat gold brain boardColor houses { id type level locationX locationY skin } } }`);
+      const data = await gqlFetch(`{ getPlayer { id username photoUrl meat gold brain boardColor houses { id type level locationX locationY skin } } }`);
       log("getPlayer:", data);
     };
     document.getElementById("btn-gql-houses-cfg").onclick = async () => {
