@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/changeset/005-add-fks.yaml
   - include:
       file: db/changelog/changeset/006-add-player-last-meat-update.yaml
+  - include:
+      file: db/changelog/changeset/007-add-player-photo-url.yaml
