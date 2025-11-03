@@ -61,6 +61,7 @@ type RemoveHousePayload {
 type Player {
   id: ID!
   username: String!
+  photoUrl: String!
   meat: Long!
   gold: Long!
   brain: Long!
