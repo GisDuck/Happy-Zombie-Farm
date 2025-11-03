@@ -7,6 +7,7 @@ import game.Happy_Zombie_Farm.entity.Player;
 import game.Happy_Zombie_Farm.entity.UserAuth;
 import game.Happy_Zombie_Farm.exception.TelegramDataNotValidException;
 import game.Happy_Zombie_Farm.mapper.PlayerMapper;
+import game.Happy_Zombie_Farm.repository.PlayerRepository;
 import game.Happy_Zombie_Farm.security.JwtService;
 import game.Happy_Zombie_Farm.service.AuthService;
 import game.Happy_Zombie_Farm.service.PlayerService;
@@ -36,6 +37,8 @@ public class AuthController {
     @Autowired
     private PlayerService playerService;
     @Autowired
+    private PlayerRepository playerRepository;
+    @Autowired
     private AuthService authService;
 
     private static final String REFRESH_COOKIE = "HZF_REFRESH";
@@ -63,6 +66,8 @@ public class AuthController {
                 player = telegramAuthService.registerTelegramUser(telegramAuthDto);
             } else {
                 player = optionalUserAuth.get().getPlayer();
+                player.setPhotoUrl(telegramAuthDto.photoUrl());
+                playerRepository.save(player);
             }
 
             String accessToken = jwtService.generateAccessToken(player.getId(), player.getUsername());
