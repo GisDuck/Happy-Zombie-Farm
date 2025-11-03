@@ -1,6 +1,7 @@
 package game.Happy_Zombie_Farm.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import game.Happy_Zombie_Farm.enums.HouseType;
 import jakarta.validation.constraints.*;
 
 import java.util.Map;
@@ -11,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @ConfigurationProperties(prefix = "houses-info")
 public record HousesInfoCfg(
-        @NotEmpty Map<@NotNull String, @NotNull HouseCfg> type
+        @NotEmpty Map<@NotNull HouseType, @NotNull HouseCfg> type
 ) {
     @Validated
     public record HouseCfg(
@@ -33,8 +34,8 @@ public record HousesInfoCfg(
     @Validated
     public record SkinCfg(
             @PositiveOrZero long price,
-            @Positive int width,
-            @Positive int height
+            @PositiveOrZero int width,
+            @PositiveOrZero int height
     ) {}
 
 }
