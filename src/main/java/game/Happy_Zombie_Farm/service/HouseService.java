@@ -60,7 +60,7 @@ public class HouseService {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new NoPlayerException(playerId));
 
-        log.info("housesInfoCfg {} ", housesInfoCfg);
+        log.info("BuildHouseInputDto = {} ", input);
 
         Long gold = housesInfoCfg
             .type()
