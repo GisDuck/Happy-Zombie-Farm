@@ -8,6 +8,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: photo_url
-                  type: varchar(150)
+                  type: varchar(255)
+                  defaultValue: ''
                   constraints:
                     nullable: false
