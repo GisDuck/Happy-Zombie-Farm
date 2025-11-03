@@ -131,6 +131,9 @@ public class TelegramAuthService {
         if (telegramAuthDto.firstName() != null) {
             data.put("first_name", telegramAuthDto.firstName());
         }
+        if (telegramAuthDto.firstName() != null) {
+            data.put("last_name", telegramAuthDto.lastName());
+        }
         if (telegramAuthDto.id() != null) {
             data.put("id", telegramAuthDto.id().toString());
         }
