@@ -100,6 +100,7 @@ public class TelegramAuthService {
 
         Player player = new Player();
         player.setUsername(telegramAuthDto.username());
+        player.setPhotoUrl(telegramAuthDto.photoUrl());
         player.setBoardColor(getRandomBoardColor());
         player.setMeat(0L);
         player.setGold(0L);

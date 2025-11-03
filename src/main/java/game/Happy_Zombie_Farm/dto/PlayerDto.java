@@ -6,6 +6,7 @@ import java.util.List;
 public record PlayerDto(
         Long id,
         String username,
+        String photoUrl,
         Long meat,
         Long gold,
         Long brain,

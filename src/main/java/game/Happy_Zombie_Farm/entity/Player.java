@@ -26,6 +26,9 @@ public class Player {
     @Column(nullable = false, length = 50)
     private String username;
 
+    @Column(nullable = false, name = "photo_url")
+    private String photoUrl;
+
     @Column(nullable = false)
     private Long meat;
 
