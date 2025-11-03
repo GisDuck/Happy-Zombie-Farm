@@ -10,25 +10,23 @@ import game.Happy_Zombie_Farm.entity.Player;
 import game.Happy_Zombie_Farm.exception.NoHouseException;
 import game.Happy_Zombie_Farm.exception.NoPlayerException;
 import game.Happy_Zombie_Farm.exception.NotThisPlayerHouseIdException;
+import game.Happy_Zombie_Farm.exception.WrongSkinHouseParamException;
 import game.Happy_Zombie_Farm.mapper.HouseMapper;
 import game.Happy_Zombie_Farm.repository.HouseRepository;
 import game.Happy_Zombie_Farm.repository.PlayerRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class HouseService {
-
-    private static final Logger log = LoggerFactory.getLogger(HouseService.class);
-
     @Autowired
     private HouseRepository houseRepository;
     @Autowired
@@ -62,17 +60,19 @@ public class HouseService {
 
         log.info("BuildHouseInputDto = {} ", input);
 
-        Long gold = housesInfoCfg
-            .type()
-            .get(input.type())
-            .skins()
-            .get(input.skin())
-            .price();
-
-        log.info("skin {} ", housesInfoCfg
+        Map<String, HousesInfoCfg.SkinCfg> skins = housesInfoCfg
                 .type()
                 .get(input.type())
-                .skins());
+                .skins();
+
+        HousesInfoCfg.SkinCfg skinCfg = skins.get(input.skin());
+
+        if (skinCfg == null) {
+            log.info("Unknown skin for build '{}', for: {}", input.skin(), skins.keySet());
+            throw new WrongSkinHouseParamException(input.type().name(), input.skin());
+        }
+
+        Long gold = skinCfg.price();
 
         playerService.takeMoney(gold, player);
 
@@ -98,7 +98,7 @@ public class HouseService {
 
         Player player = house.getPlayer();
 
-        if (player.getId() != playerId) {
+        if (!Objects.equals(player.getId(), playerId)) {
             throw new NotThisPlayerHouseIdException(input.houseId());
         }
 
@@ -126,16 +126,25 @@ public class HouseService {
 
         Player player = house.getPlayer();
 
-        if (player.getId() != playerId) {
+        if (!Objects.equals(player.getId(), playerId)) {
             throw new NotThisPlayerHouseIdException(input.houseId());
         }
 
-        Long newSkinPrice = housesInfoCfg
-            .type()
-            .get(house.getType())
-            .skins()
-            .get(input.newSkin())
-            .price();
+        log.info("UpdateHouseSkinInputDto = {} ", input);
+
+        Map<String, HousesInfoCfg.SkinCfg> skins = housesInfoCfg
+                .type()
+                .get(house.getType())
+                .skins();
+
+        HousesInfoCfg.SkinCfg skinCfg = skins.get(input.newSkin());
+
+        if (skinCfg == null) {
+            log.info("Unknown skin for update '{}', for: {}", input.newSkin(), skins.keySet());
+            throw new WrongSkinHouseParamException(house.getType().name(), input.newSkin());
+        }
+
+        Long newSkinPrice = skinCfg.price();
 
         playerService.takeMoney(newSkinPrice, player);
 
@@ -154,7 +163,7 @@ public class HouseService {
 
         Player player = house.getPlayer();
 
-        if (player.getId() != playerId) {
+        if (!Objects.equals(player.getId(), playerId)) {
             throw new NotThisPlayerHouseIdException(input.houseId());
         }
 
@@ -171,11 +180,11 @@ public class HouseService {
 
         Player player = house.getPlayer();
 
-        if (player.getId() != playerId) {
+        if (!Objects.equals(player.getId(), playerId)) {
             throw new NotThisPlayerHouseIdException(input.houseId());
         }
 
-        Long gold = housesInfoCfg
+        long gold = housesInfoCfg
                 .type()
                 .get(house.getType())
                 .skins()

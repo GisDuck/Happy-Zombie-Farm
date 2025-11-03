@@ -12,11 +12,9 @@ import game.Happy_Zombie_Farm.service.AuthService;
 import game.Happy_Zombie_Farm.service.PlayerService;
 import game.Happy_Zombie_Farm.service.TelegramAuthService;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +23,10 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Duration;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-
-    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
-
     @Autowired
     private TelegramAuthService telegramAuthService;
     @Autowired
