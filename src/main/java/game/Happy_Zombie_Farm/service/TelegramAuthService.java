@@ -1,7 +1,6 @@
 package game.Happy_Zombie_Farm.service;
 
 import game.Happy_Zombie_Farm.dto.TelegramAuthDto;
-import game.Happy_Zombie_Farm.dto.outputDto.AuthPayloadDto;
 import game.Happy_Zombie_Farm.entity.Player;
 import game.Happy_Zombie_Farm.entity.UserAuth;
 import game.Happy_Zombie_Farm.enums.BoardColor;
@@ -21,8 +20,7 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -70,7 +68,7 @@ public class TelegramAuthService {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] key = digest.digest(tgBotToken.getBytes(UTF_8));
 
-            log.info("tgBotHash {}", key.toString());
+            log.info("tgBotHash {}", Arrays.toString(key));
 
             //создаем HMAC со сгенерированным хэшем
             Mac hmac = Mac.getInstance("HmacSHA256");
