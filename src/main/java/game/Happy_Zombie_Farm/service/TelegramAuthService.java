@@ -70,7 +70,7 @@ public class TelegramAuthService {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] key = digest.digest(tgBotToken.getBytes(UTF_8));
 
-            log.info("tgBotHash", key);
+            log.info("tgBotHash {}", key.toString());
 
             //создаем HMAC со сгенерированным хэшем
             Mac hmac = Mac.getInstance("HmacSHA256");
@@ -84,7 +84,7 @@ public class TelegramAuthService {
                 validateHash.append(String.format("%02x", b));
             }
 
-            log.info("validateHash", validateHash);
+            log.info("validateHash {}", validateHash);
 
             // сравниваем полученный от телеграма и сгенерированный хэш
             return hash.contentEquals(validateHash);
