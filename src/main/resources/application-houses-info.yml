@@ -5,7 +5,6 @@ houses-info:
       height: 2
       levels:
         0:
-          price: 0
           cows: 5
         1:
           price: 10
@@ -25,9 +24,8 @@ houses-info:
       height: 2
       levels:
         0:
-          price: 0
-          max-brain: 6
-          max-meat: 6
+          max-brain: 100
+          max-meat: 500
         1:
           price: 100
           max-brain: 200
