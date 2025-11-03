@@ -4,6 +4,7 @@ import game.Happy_Zombie_Farm.exception.*;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
 import graphql.schema.DataFetchingEnvironment;
+import org.springframework.graphql.data.method.annotation.GraphQlExceptionHandler;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GraphqlExceptionHandler {
 
-    @ExceptionHandler({
+    @GraphQlExceptionHandler({
             NoHouseException.class,
             NoPlayerException.class,
             NotThisPlayerHouseIdException.class,
@@ -19,7 +20,7 @@ public class GraphqlExceptionHandler {
             TelegramDataNotValidException.class,
             WrongSkinHouseParamException.class
     })
-    public GraphQLError handleGameErrors(WrongSkinHouseParamException ex,
+    public GraphQLError handleGameErrors(RuntimeException ex,
                                         DataFetchingEnvironment env) {
         return GraphqlErrorBuilder.newError(env)
                 .message(ex.getMessage())
