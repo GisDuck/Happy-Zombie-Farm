@@ -10,7 +10,7 @@ public class WrongSkinHouseParamException extends RuntimeException {
     private final String skin;
 
     public WrongSkinHouseParamException(String type, String skin) {
-        super("Wrong skin house param skin=" + skin + "for type=" + type);
+        super("Wrong skin house param skin=" + skin + " for type=" + type);
         this.skin = skin;
     }
 }
