@@ -13,6 +13,9 @@ import game.Happy_Zombie_Farm.exception.NotThisPlayerHouseIdException;
 import game.Happy_Zombie_Farm.mapper.HouseMapper;
 import game.Happy_Zombie_Farm.repository.HouseRepository;
 import game.Happy_Zombie_Farm.repository.PlayerRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,8 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class HouseService {
+
+    private static final Logger log = LoggerFactory.getLogger(HouseService.class);
+
     @Autowired
     private HouseRepository houseRepository;
     @Autowired
@@ -52,6 +59,8 @@ public class HouseService {
     public HouseDto buildHouse(Long playerId, BuildHouseInputDto input) throws NoPlayerException {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new NoPlayerException(playerId));
+
+        log.info("housesInfoCfg {} ", housesInfoCfg);
 
         Long gold = housesInfoCfg
             .type()
