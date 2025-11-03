@@ -69,6 +69,11 @@ public class HouseService {
             .get(input.skin())
             .price();
 
+        log.info("skin {} ", housesInfoCfg
+                .type()
+                .get(input.type())
+                .skins());
+
         playerService.takeMoney(gold, player);
 
         House house = new House();
