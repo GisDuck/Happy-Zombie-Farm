@@ -10,6 +10,9 @@ public record TelegramAuthDto(
         @JsonProperty("first_name")
         String firstName,
 
+        @JsonProperty("last_name")
+        String lastName,
+
         @JsonProperty("username")
         String username,
 
