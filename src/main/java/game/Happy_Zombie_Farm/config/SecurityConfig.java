@@ -1,5 +1,6 @@
 package game.Happy_Zombie_Farm.config;
 
+import game.Happy_Zombie_Farm.idempotency.IdempotencyFilter;
 import game.Happy_Zombie_Farm.security.JwtAuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +21,9 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
 
+    @Autowired
+    private IdempotencyFilter idempotencyFilter;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -31,7 +35,8 @@ public class SecurityConfig {
                     // всё остальное — только с токеном
                     .anyRequest().authenticated()
             )
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(idempotencyFilter, JwtAuthFilter.class);
 
         return http.build();
     }
