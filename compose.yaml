@@ -37,14 +37,13 @@ services:
       - 'traefik.http.routers.pg.tls.certresolver=le'
       - 'traefik.http.services.pg.loadbalancer.server.port=80'
 
-#  redis:
-#    image: redis:7
-#    restart: always
-#    volumes:
-#      - ./redis_data:/data
-#    command: [ "redis-server", "--save", "60", "1", "--appendonly", "yes" ]
-#    ports:
-#      - '6379'
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    expose:
+      - '${REDIS_PORT}'
+    volumes:
+      - redis-data:/data
 
   app:
     image: openjdk:17
@@ -60,8 +59,7 @@ services:
     command: [ "java", "-jar", "/app/hzfarm.jar" ]
     depends_on:
       - postgres
-#      - rabbitmq
-#      - minio
+      - redis
     networks:
       - proxy
     expose:
@@ -122,3 +120,6 @@ services:
       # Юзеры
       - 'traefik.http.middlewares.auth.basicauth.usersfile=/auth/users'
       - 'traefik.http.routers.traefik.middlewares=auth'
+
+volumes:
+  redis-data:
