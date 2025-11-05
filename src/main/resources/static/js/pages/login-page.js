@@ -1,5 +1,5 @@
 import { bindBaseUrlInput, onBaseUrlChange, formatUrlForDisplay } from '../common/config.js';
-import { telegramLogin, parseTelegramWidgetString, buildTelegramPayloadFromForm } from '../common/auth.js';
+import { telegramLogin, parseTelegramWidgetString, buildTelegramPayloadFromForm, ensureNumber } from '../common/auth.js';
 import { refreshAccessToken, logout, getStoredAccessToken, setStoredAccessToken, clearStoredAccessToken, describeTokenState, onAccessTokenChange, getCsrfToken } from '../common/tokens.js';
 import { graphqlQuery, formatGraphQlError } from '../common/graphql.js';
 import { appendLog, withButtonLoader, updateTextContent, bindCopyToClipboard } from '../common/ui.js';
@@ -9,6 +9,7 @@ const elements = {
   baseDisplay: document.querySelector('[data-el="base-display"]'),
   loginForm: document.querySelector('[data-el="login-form"]'),
   loginButton: document.querySelector('[data-el="login-button"]'),
+  widgetPreview: document.querySelector('[data-el="widget-preview"]'),
   rawTextarea: document.querySelector('[data-el="raw-payload"]'),
   rawButton: document.querySelector('[data-el="login-raw"]'),
   refreshButton: document.querySelector('[data-el="refresh-button"]'),
@@ -53,6 +54,7 @@ async function handleLogin(payloadProvider, button) {
         appendLog(elements.log, '❗ Заполните данные для входа');
         return;
       }
+      updateStatus('Отправляем данные в Telegram login…');
       const result = await telegramLogin(payload);
       updateStatus('Вход выполнен', 'ok');
       appendLog(elements.log, '✅ telegram-login ok', result.body || '(пустой ответ)');
@@ -66,10 +68,87 @@ async function handleLogin(payloadProvider, button) {
   });
 }
 
+function fillLoginForm(payload) {
+  if (!elements.loginForm || !payload) return;
+  const mapping = {
+    id: 'id',
+    firstName: 'firstName',
+    lastName: 'lastName',
+    username: 'username',
+    photoUrl: 'photoUrl',
+    authDate: 'authDate',
+    hash: 'hash',
+  };
+  Object.entries(mapping).forEach(([field, name]) => {
+    const input = elements.loginForm.elements.namedItem(name);
+    if (input) {
+      input.value = payload[field] != null ? payload[field] : '';
+    }
+  });
+}
+
+function updateWidgetPreview(payload) {
+  if (!elements.widgetPreview) return;
+  if (!payload) {
+    elements.widgetPreview.textContent = '(нет данных)';
+    return;
+  }
+  const parts = [];
+  if (payload.username) parts.push(`@${payload.username}`);
+  if (payload.firstName || payload.lastName) {
+    parts.push(`${payload.firstName || ''} ${payload.lastName || ''}`.trim());
+  }
+  if (payload.id) parts.push(`#${payload.id}`);
+  if (payload.authDate) {
+    const date = new Date(Number(payload.authDate) * 1000);
+    if (!Number.isNaN(date.getTime())) {
+      parts.push(date.toLocaleString());
+    }
+  }
+  elements.widgetPreview.textContent = parts.filter(Boolean).join(' • ') || '(нет данных)';
+}
+
+function convertWidgetUser(user) {
+  if (!user) return null;
+  return {
+    id: ensureNumber(user.id),
+    firstName: user.first_name || undefined,
+    lastName: user.last_name || undefined,
+    username: user.username || undefined,
+    photoUrl: user.photo_url || undefined,
+    authDate: ensureNumber(user.auth_date),
+    hash: user.hash || undefined,
+  };
+}
+
 function initialiseBaseUrl() {
   bindBaseUrlInput(elements.baseInput, syncTokenState);
   onBaseUrlChange(() => syncTokenState());
   syncTokenState();
+}
+
+function setupTelegramWidget() {
+  window.__handleTelegramAuth = (user) => {
+    const payload = convertWidgetUser(user);
+    updateWidgetPreview(payload);
+    if (payload) {
+      appendLog(elements.log, '🤖 Telegram widget payload', payload);
+      fillLoginForm(payload);
+      if (elements.rawTextarea) {
+        elements.rawTextarea.value = JSON.stringify(payload, null, 2);
+      }
+      updateStatus('Получены данные от Telegram, выполняем вход…');
+      handleLogin(() => payload, null).catch(() => {});
+    } else {
+      appendLog(elements.log, '⚠️ Telegram widget передал пустые данные');
+    }
+  };
+
+  if (Array.isArray(window.__pendingTelegramUsers) && window.__pendingTelegramUsers.length) {
+    const pending = [...window.__pendingTelegramUsers];
+    window.__pendingTelegramUsers.length = 0;
+    pending.forEach((user) => window.__handleTelegramAuth(user));
+  }
 }
 
 function setupLoginForm() {
@@ -172,6 +251,7 @@ setupManualTokenControls();
 setupCheckAccessButton();
 setupCopyButtons();
 initListeners();
+setupTelegramWidget();
 
 appendLog(elements.log, '🟣 Страница входа загружена. Укажите BASE URL и выполните авторизацию.');
 updateStatus('Ожидается вход');

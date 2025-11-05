@@ -32,8 +32,46 @@
     </section>
 
     <section class="card card--span-4">
-      <div class="card__title">Вход по данным Telegram</div>
-      <div class="card__subtitle">Заполните поля, полученные из виджета Telegram Login Widget.</div>
+      <div class="card__title">Вход через Telegram</div>
+      <div class="card__subtitle">Используйте официальный Telegram Login Widget для авторизации.</div>
+      <div class="telegram-widget" data-el="telegram-widget">
+        <div class="telegram-widget__button" data-el="telegram-widget-button">
+          <script>
+            window.__pendingTelegramUsers = window.__pendingTelegramUsers || [];
+            window.onTelegramAuth = function onTelegramAuth(user) {
+              if (window.__handleTelegramAuth) {
+                window.__handleTelegramAuth(user);
+              } else {
+                window.__pendingTelegramUsers.push(user);
+                console.log('Telegram auth payload received before init', user);
+              }
+            };
+          </script>
+          <script
+            async
+            src="https://telegram.org/js/telegram-widget.js?22"
+            data-telegram-login="hzfarm_bot"
+            data-size="large"
+            data-request-access="write"
+            data-onauth="onTelegramAuth(user)"
+          ></script>
+        </div>
+        <div class="telegram-widget__info">
+          <div class="info-line">
+            <span class="tag">Последний payload</span>
+            <span data-el="widget-preview">(нет данных)</span>
+          </div>
+          <p class="small-text">
+            После успешного входа accessToken появится в карточке ниже. Для повторного входа достаточно
+            снова нажать кнопку «Login with Telegram».
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card card--span-4">
+      <div class="card__title">Ручной ввод данных (опционально)</div>
+      <div class="card__subtitle">Данные автоматически подставляются после авторизации через Telegram.</div>
       <form class="field-group" data-el="login-form">
         <div class="inline-fields">
           <div class="field">

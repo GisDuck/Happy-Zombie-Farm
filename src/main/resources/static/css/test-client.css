@@ -470,3 +470,35 @@ fieldset + fieldset {
   border-top: 1px dashed rgba(148, 163, 184, 0.35);
   margin: 16px 0;
 }
+
+.telegram-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.telegram-widget__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 8px;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px dashed rgba(56, 189, 248, 0.4);
+  border-radius: var(--radius-md);
+}
+
+.telegram-widget__info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.telegram-widget__info .info-line {
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.telegram-widget__info [data-el='widget-preview'] {
+  color: var(--muted);
+  word-break: break-word;
+}
