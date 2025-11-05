@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HZFarm — защищённые мутации</title>
+  <link rel="stylesheet" href="css/test-client.css" />
+</head>
+<body>
+  <header class="page-header">
+    <h1>HZFarm • GraphQL Mutation + Idempotency-Key</h1>
+    <div class="page-header__subtitle">Все операции требуют активной сессии, CSRF токена и уникального Idempotency-Key.</div>
+  </header>
+
+  <main class="layout-grid">
+    <section class="card card--span-4">
+      <div class="card__title">Контекст сессии</div>
+      <div class="field">
+        <label for="baseUrl">BASE URL</label>
+        <input id="baseUrl" type="text" data-el="base-input" placeholder="https://hzfarm.ru" />
+      </div>
+      <div class="divider-dashed"></div>
+      <div class="field">
+        <label>Сервер</label>
+        <div class="info-line">
+          <span class="tag">URL</span>
+          <strong data-el="base-display"></strong>
+        </div>
+      </div>
+      <div class="field">
+        <label>accessToken</label>
+        <div class="info-line">
+          <span data-el="token-preview">(нет)</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>CSRF token</label>
+        <div class="info-line">
+          <span data-el="csrf-value">(нет)</span>
+        </div>
+      </div>
+      <p class="notice">После успешного логина обновите страницу — она должна загрузиться только при валидном access токене.</p>
+    </section>
+
+    <section class="card card--span-4">
+      <div class="card__title">Idempotency-Key</div>
+      <div class="card__subtitle">Используйте один и тот же ключ для проверки повторных вызовов или обновляйте перед новой операцией.</div>
+      <div class="field">
+        <label for="idemKey">Текущий ключ</label>
+        <input id="idemKey" type="text" data-el="idem-key" placeholder="auto-generated" />
+      </div>
+      <div class="button-row">
+        <button class="btn" type="button" data-el="idem-generate">Новый ключ</button>
+      </div>
+      <p class="small-text">Ключ автоматически добавляется в заголовок <code>Idempotency-Key</code>.</p>
+    </section>
+
+    <section class="card card--span-4">
+      <div class="card__title">Дома игрока</div>
+      <div class="card__subtitle">Для мутаций над существующими домами сначала загрузите список и выберите дом.</div>
+      <div class="field">
+        <label for="houseSelect">Выберите дом</label>
+        <select id="houseSelect" data-el="houses-select">
+          <option value="">(нет данных)</option>
+        </select>
+      </div>
+      <div class="button-row">
+        <button class="btn" type="button" data-el="load-houses" data-loading-text="Обновляем…">Обновить список домов</button>
+      </div>
+      <p class="small-text">После выполнения мутаций рекомендуется обновлять список, чтобы отобразить изменения.</p>
+    </section>
+
+    <section class="card card--span-6">
+      <div class="card__title">Построить дом</div>
+      <div class="field-group">
+        <div class="inline-fields">
+          <div class="field">
+            <label for="buildType">Тип дома</label>
+            <select id="buildType" data-el="build-type">
+              <option value="FARM">FARM</option>
+              <option value="STORAGE">STORAGE</option>
+              <option value="DECOR">DECOR</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="buildSkin">Skin</label>
+            <input id="buildSkin" type="text" data-el="build-skin" value="default" />
+          </div>
+        </div>
+        <div class="inline-fields">
+          <div class="field">
+            <label for="buildX">X</label>
+            <input id="buildX" type="number" data-el="build-x" value="0" />
+          </div>
+          <div class="field">
+            <label for="buildY">Y</label>
+            <input id="buildY" type="number" data-el="build-y" value="0" />
+          </div>
+        </div>
+        <div class="button-row">
+          <button class="btn" type="button" data-el="mutation-build" data-loading-text="Создаём…">buildHouse</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card card--span-6">
+      <div class="card__title">Управление выбранным домом</div>
+      <fieldset>
+        <legend>Переместить</legend>
+        <div class="inline-fields">
+          <div class="field">
+            <label for="moveX">Новый X</label>
+            <input id="moveX" type="number" data-el="move-x" value="0" />
+          </div>
+          <div class="field">
+            <label for="moveY">Новый Y</label>
+            <input id="moveY" type="number" data-el="move-y" value="0" />
+          </div>
+        </div>
+        <button class="btn" type="button" data-el="mutation-move" data-loading-text="Обновляем…">updateHouseLocation</button>
+      </fieldset>
+      <div class="section-divider"></div>
+      <fieldset>
+        <legend>Обновить skin</legend>
+        <div class="field">
+          <label for="skinNew">Skin</label>
+          <input id="skinNew" type="text" data-el="skin-new" value="default" />
+        </div>
+        <button class="btn" type="button" data-el="mutation-skin" data-loading-text="Обновляем…">updateHouseSkin</button>
+      </fieldset>
+      <div class="section-divider"></div>
+      <div class="button-row">
+        <button class="btn" type="button" data-el="mutation-level" data-loading-text="Повышаем…">updateHouseLevel</button>
+        <button class="btn btn--danger" type="button" data-el="mutation-delete" data-loading-text="Удаляем…">removeHouse</button>
+      </div>
+    </section>
+
+    <section class="card card--span-6">
+      <div class="card__title">Ресурсы игрока</div>
+      <div class="button-row">
+        <button class="btn" type="button" data-el="mutation-meat" data-loading-text="Начисляем…">updatePlayerMeat</button>
+      </div>
+      <div class="divider-dashed"></div>
+      <div class="field-group">
+        <div class="field">
+          <label for="convertMeat">Meat → Brain (кол-во meat)</label>
+          <input id="convertMeat" type="number" data-el="convert-meat" value="10" />
+        </div>
+        <button class="btn" type="button" data-el="mutation-convert-meat" data-loading-text="Конвертируем…">convertMeatToBrain</button>
+      </div>
+      <div class="field-group" style="margin-top:16px;">
+        <div class="field">
+          <label for="convertBrain">Brain → Gold (кол-во brain)</label>
+          <input id="convertBrain" type="number" data-el="convert-brain" value="5" />
+        </div>
+        <button class="btn" type="button" data-el="mutation-convert-brain" data-loading-text="Конвертируем…">convertBrainToGold</button>
+      </div>
+    </section>
+
+    <section class="card card--span-12">
+      <div class="card__title">Ответ</div>
+      <pre class="log-area" data-el="result">—</pre>
+    </section>
+
+    <section class="card card--span-12">
+      <div class="card__title">Лог действий</div>
+      <pre class="log-area" data-el="log"></pre>
+    </section>
+  </main>
+
+  <script type="module" src="js/pages/secure-mutations-page.js"></script>
+</body>
+</html>
