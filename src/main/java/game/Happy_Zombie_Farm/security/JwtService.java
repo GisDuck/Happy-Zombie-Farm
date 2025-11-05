@@ -2,7 +2,6 @@ package game.Happy_Zombie_Farm.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +32,7 @@ public class JwtService {
         Instant exp = now.plusMillis(props.getAccessExpirationMs());
 
         return Jwts.builder()
-                .claims(claims)                // вместо setClaims(...)
+                .claims(claims)
                 .subject(String.valueOf(playerId))
                 .issuedAt(java.util.Date.from(now))
                 .expiration(java.util.Date.from(exp))
@@ -46,6 +44,8 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("playerId", playerId);
         claims.put("tokenType", "refresh");
+
+//        ДОБАВИТЬ ЗАПОМИНАНИЕ СТАРЫХ РЕФРЕШЕЙ!!!!!!!
 
         Instant now = Instant.now();
         Instant exp = now.plusMillis(props.getRefreshExpirationMs());

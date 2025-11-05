@@ -3,3 +3,5 @@ security:
     secret: ${JWT_SECRET}
     access-expiration-ms: 900000     # 15 минут
     refresh-expiration-ms: 1209600000 # 14 дней
+    refresh-cookie-name: HZF_REFRESH
+    access-cookie-name: HZF_ACCESS

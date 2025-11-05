@@ -5,15 +5,14 @@ import game.Happy_Zombie_Farm.security.JwtAuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 public class SecurityConfig {
@@ -27,11 +26,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)
+            .csrf(csrf -> csrf
+                    .ignoringRequestMatchers("/auth/**")   // логин/refresh/logout можно без CSRF
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                     // REST логин можно
                     .requestMatchers("/auth/**").permitAll()
+                    .requestMatchers("/", "/index", "/index.html").permitAll()
                     // всё остальное — только с токеном
                     .anyRequest().authenticated()
             )
@@ -44,8 +46,8 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring().requestMatchers(
-                "/", "/index", "/index.html", "/static/**",
-                "/public/**", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/error"
+                "/static/**",
+                "/public/**", "/css/**", "/js/**", "/img/**", "/favicon.ico", "/error"
         );
     }
 
