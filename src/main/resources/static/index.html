@@ -2,527 +2,207 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
-    <title>HZFarm — тестовый клиент</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>HZFarm – тест авторизации</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-        :root {
-          --bg: #0f172a;
-          --bg2: #020617;
-          --card: #111827;
-          --text: #e2e8f0;
-          --muted: #94a3b8;
-          --border: #1f2937;
-          --accent: #38bdf8;
-        }
         body {
-          margin: 0;
-          background: var(--bg);
-          color: var(--text);
-          font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-          padding: 16px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #0f172a;
+            color: #e5e7eb;
+            margin: 0;
+            padding: 0;
+        }
+        a {
+            color: #38bdf8;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
         }
         h1 {
-          margin-top: 0;
-          font-size: 18px;
+            font-size: 28px;
+            margin-bottom: 8px;
         }
-        .flex {
-          display: flex;
-          gap: 12px;
-          flex-wrap: wrap;
+        h2 {
+            margin-top: 24px;
+            margin-bottom: 8px;
         }
-        .card {
-          background: var(--card);
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          padding: 12px;
-          margin-bottom: 14px;
-          min-width: 280px;
+        nav {
+            margin-bottom: 24px;
         }
-        label {
-          display: inline-block;
-          margin-bottom: 4px;
-          font-size: 12px;
+        nav a, nav button {
+            display: inline-block;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid #334155;
+            background: #020617;
+            color: #e5e7eb;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
         }
-        input, select, textarea {
-          background: var(--bg2);
-          border: 1px solid var(--border);
-          border-radius: 4px;
-          padding: 4px 6px;
-          color: var(--text);
-          font-size: 12px;
+        nav button:hover,
+        nav a:hover {
+            background: #1f2937;
         }
         button {
-          background: #1f2937;
-          border: 1px solid #334155;
-          border-radius: 4px;
-          color: var(--text);
-          padding: 4px 8px;
-          font-size: 12px;
-          cursor: pointer;
-          margin: 2px 2px 2px 0;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid #334155;
+            background: #020617;
+            color: #e5e7eb;
+            cursor: pointer;
+            font-size: 14px;
         }
-        button:hover { background: #334155; }
-        pre {
-          background: var(--bg2);
-          border: 1px solid var(--border);
-          border-radius: 6px;
-          padding: 10px;
-          font-size: 12px;
-          max-height: 300px;
-          overflow: auto;
-          white-space: pre-wrap;
-          word-break: break-word;
+        button:hover {
+            background: #1f2937;
         }
-        .small { font-size: 11px; color: var(--muted); }
-        .row { margin-bottom: 6px; }
+        section {
+            margin-bottom: 24px;
+            padding: 16px;
+            border-radius: 16px;
+            background: rgba(15,23,42,0.9);
+            border: 1px solid #1f2937;
+        }
+        #log {
+            background: #020617;
+            border-radius: 12px;
+            padding: 12px;
+            max-height: 260px;
+            overflow: auto;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .small {
+            font-size: 12px;
+            color: #9ca3af;
+        }
     </style>
 </head>
 <body>
+<div class="container">
+    <h1>HZFarm – тест авторизации</h1>
+    <p class="small">
+        Главная страница. Здесь проверяем вход через Telegram, refresh и logout.
+    </p>
 
-<h1>HZFarm — тестовый клиент</h1>
+    <nav>
+        <a href="/index.html">На главную</a>
+        <a href="/idem.html">Перейти на страницу GraphQL / idem</a>
+    </nav>
 
-<div class="card">
-    <div class="row">
-        <label for="baseUrl">BASE URL (сохр. в localStorage):</label><br />
-        <input id="baseUrl" type="text" value="" style="width: 260px" />
-        <button id="btn-save-base">Сохранить</button>
-        <span class="small">например: https://hzfarm.ru или http://localhost:8080</span>
-    </div>
-    <div class="row">
-        <strong>access:</strong> <span id="access-text">(нет)</span>
-        <button id="btn-clear-access">Очистить</button>
-        <button id="btn-check-access">Проверить access (getPlayer)</button>
-    </div>
-    <div class="row">
-        <!-- виджет входа через телеграм после определения функции -->
-        <script>
-            // Заглушка — реальную функцию мы определим ниже, но виджет может грузиться уже сейчас
-            window.onTelegramAuth = function(u){ console.log("widget waiting...", u); }
-        </script>
-        <script async src="https://telegram.org/js/telegram-widget.js?22"
-                data-telegram-login="hzfarm_bot"
-                data-size="large"
-                data-onauth="onTelegramAuth(user)"></script>
-    </div>
-</div>
-
-<div class="flex">
-    <!-- AUTH -->
-    <div class="card" style="flex:1 1 280px;">
-        <h3>AUTH</h3>
-        <button id="btn-refresh">POST /auth/refresh</button>
-        <button id="btn-check-refresh">ПРОВЕРИТЬ refresh</button>
-        <p class="small">refresh идёт с cookie, поэтому <code>credentials:"include"</code>.</p>
-    </div>
-
-    <!-- GQL базовые -->
-    <div class="card" style="flex:1 1 280px;">
-        <h3>GraphQL — базовые</h3>
-        <button id="btn-gql-player">Query: getPlayer</button>
-        <button id="btn-gql-houses-cfg">Query: getHousesInfoCfg</button>
-        <button id="btn-gql-logic-cfg">Query: getGameLogicCfg</button>
-        <button id="btn-gql-meat">Mutation: updatePlayerMeat</button>
-        <button id="btn-reload">Перезагрузить страницу</button>
-    </div>
-
-    <!-- ПОСТРОИТЬ ДОМ (отдельно сверху, как просил) -->
-    <div class="card" style="flex:1 1 300px;">
-        <h3>Построить дом</h3>
-        <div class="row">
-            <label>Тип:</label><br />
-            <select id="build-type">
-                <option value="FARM">FARM</option>
-                <option value="STORAGE">STORAGE</option>
-                <option value="DECOR">DECOR</option>
-                <option value="BRA">BRA</option>
-            </select>
+    <section>
+        <h2>Вход через Telegram</h2>
+        <p class="small">
+            Нажми на кнопку ниже, пройди авторизацию в Telegram – на бэке вызовется
+            <code>POST /auth/telegram-login</code>, и установятся cookie с access/refresh.
+        </p>
+        <div id="telegram-login-container">
+            <script async src="https://telegram.org/js/telegram-widget.js?22"
+                    data-telegram-login="hzfarm_bot"
+                    data-size="large"
+                    data-onauth="onTelegramAuth(user)"
+                    data-request-access="write">
+            </script>
         </div>
-        <div class="row">
-            <label>Skin (string):</label><br />
-            <input id="build-skin" type="text" value="default" />
-        </div>
-        <div class="row">
-            <label>X:</label>
-            <input id="build-x" type="number" value="0" style="width:60px;" />
-            <label>Y:</label>
-            <input id="build-y" type="number" value="0" style="width:60px;" />
-        </div>
-        <button id="btn-build">Mutation: buildHouse</button>
-        <p class="small">После постройки список домов можно обновить в блоке ниже.</p>
-    </div>
-</div>
+    </section>
 
-<div class="flex">
-    <!-- Работа с существующими домами -->
-    <div class="card" style="flex:1 1 340px;">
-        <h3>Дома игрока</h3>
-        <button id="btn-load-houses">Обновить список домов</button>
-        <select id="sel-house" style="width:100%; margin-top:6px;">
-            <option value="">(нет данных)</option>
-        </select>
+    <section>
+        <h2>Управление токенами</h2>
+        <p class="small">
+            Эти кнопки ходят на <code>/auth/refresh</code> и <code>/auth/logout</code>.
+            CSRF на /auth/** отключён, поэтому можно просто делать POST.
+        </p>
+        <button id="btn-refresh">POST /auth/refresh (обновить access/refresh)</button>
+        <button id="btn-logout">POST /auth/logout (выход)</button>
+    </section>
 
-        <hr />
-        <h4 style="margin-bottom:4px;">Изменить локацию</h4>
-        <label>X:</label>
-        <input id="move-x" type="number" value="1" style="width:70px;" />
-        <label>Y:</label>
-        <input id="move-y" type="number" value="1" style="width:70px;" />
-        <button id="btn-move">updateHouseLocation</button>
-
-        <h4 style="margin-bottom:4px; margin-top:10px;">Изменить скин (string)</h4>
-        <input id="skin-new" type="text" value="default" style="width:140px;" />
-        <button id="btn-change-skin">updateHouseSkin</button>
-
-        <h4 style="margin-bottom:4px; margin-top:10px;">Повысить уровень</h4>
-        <button id="btn-upgrade">updateHouseLevel</button>
-
-        <h4 style="margin-bottom:4px; margin-top:10px;">Удалить</h4>
-        <button id="btn-delete">removeHouse</button>
-    </div>
-
-    <!-- Конвертации -->
-    <div class="card" style="flex:1 1 260px;">
-        <h3>Конвертации</h3>
-        <div class="row">
-            <label>Meat → Brain:</label><br/>
-            <input id="conv-meat" type="number" value="10" style="width:120px;" />
-            <button id="btn-conv-meat">convertMeatToBrain</button>
-        </div>
-        <div class="row">
-            <label>Brain → Gold:</label><br/>
-            <input id="conv-brain" type="number" value="5" style="width:120px;" />
-            <button id="btn-conv-brain">convertBrainToGold</button>
-        </div>
-    </div>
-</div>
-
-<div class="card">
-    <h3>Лог</h3>
-    <pre id="log"></pre>
+    <section>
+        <h2>Логи</h2>
+        <pre id="log"></pre>
+    </section>
 </div>
 
 <script>
-    // ==== КОНСТАНТЫ / ХЕЛПЕРЫ ====
-    const ACCESS_KEY = "hzf_access_token";
-    const BASE_KEY = "hzf_base_url";
-
-    function log(...args) {
-      const el = document.getElementById("log");
-      const line = args.map(a => {
-        if (typeof a === "string") return a;
-        try { return JSON.stringify(a, null, 2); } catch (e) { return String(a); }
-      }).join(" ");
-      el.textContent = line + "\n" + el.textContent;
-      console.log(...args);
+    function appendLog(message, obj) {
+        const logEl = document.getElementById("log");
+        const ts = new Date().toISOString().substring(11, 19);
+        let line = "[" + ts + "] " + message;
+        if (obj !== undefined) {
+            try {
+                line += "\n" + JSON.stringify(obj, null, 2);
+            } catch (e) {
+                line += "\n" + String(obj);
+            }
+        }
+        logEl.textContent = line + "\n" + logEl.textContent;
     }
 
-    function getBaseUrl() {
-      const v = document.getElementById("baseUrl").value.trim();
-      return v || window.location.origin;
+    async function onTelegramAuth(user) {
+        appendLog("Получены данные от Telegram, отправляем на /auth/telegram-login …", user);
+
+        const payload = {
+            id: user.id,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            username: user.username,
+            photo_url: user.photo_url,
+            auth_date: user.auth_date,
+            hash: user.hash
+        };
+
+        try {
+            const resp = await fetch("/auth/telegram-login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify(payload)
+            });
+
+            appendLog("Ответ /auth/telegram-login: " + resp.status + " " + resp.statusText);
+
+            if (resp.ok) {
+                appendLog("Успешный вход через Telegram. Можно идти на /idem.html");
+            } else {
+                const text = await resp.text();
+                appendLog("Тело ошибки при логине:", text);
+            }
+        } catch (e) {
+            appendLog("Ошибка при запросе /auth/telegram-login", e);
+        }
     }
 
-    function saveBaseUrl() {
-      const v = document.getElementById("baseUrl").value.trim();
-      localStorage.setItem(BASE_KEY, v);
-      log("BASE_URL сохранён:", v);
+    async function callAuth(path) {
+        appendLog("POST " + path + " …");
+        try {
+            const resp = await fetch(path, {
+                method: "POST",
+                credentials: "include"
+            });
+            const text = await resp.text();
+            appendLog("Ответ " + path + ": " + resp.status + " " + resp.statusText, text);
+        } catch (e) {
+            appendLog("Ошибка при запросе " + path, e);
+        }
     }
 
-    function loadBaseUrl() {
-      const saved = localStorage.getItem(BASE_KEY);
-      if (saved) {
-        document.getElementById("baseUrl").value = saved;
-      } else {
-        document.getElementById("baseUrl").value = window.location.origin;
-      }
-    }
+    document.addEventListener("DOMContentLoaded", function () {
+        const btnRefresh = document.getElementById("btn-refresh");
+        const btnLogout = document.getElementById("btn-logout");
 
-    function setAccess(token) {
-      if (token) {
-        localStorage.setItem(ACCESS_KEY, token);
-      } else {
-        localStorage.removeItem(ACCESS_KEY);
-      }
-      renderAccess();
-    }
-
-    function getAccess() {
-      return localStorage.getItem(ACCESS_KEY);
-    }
-
-    function renderAccess() {
-      const t = getAccess();
-      document.getElementById("access-text").textContent = t ? t : "(нет)";
-    }
-
-    // ==== TELEGRAM AUTH ====
-    window.onTelegramAuth = async function(user) {
-      try {
-        log("TG user:", user);
-        const resp = await fetch(getBaseUrl() + "/auth/telegram-login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(user)
+        btnRefresh.addEventListener("click", function () {
+            callAuth("/auth/refresh");
         });
-        const text = await resp.text();
-        let json;
-        try { json = JSON.parse(text); } catch(e) {}
-        const token = json?.accessToken || json?.token || text;
-        if (!token) {
-          log("❌ Не получили access после /auth/telegram-login:", text);
-          alert("Не получили access: см. лог");
-          return;
-        }
-        setAccess(token);
-        log("✅ Авторизация прошла, access получен");
-      } catch (e) {
-        log("❌ Ошибка telegram-login:", e);
-      }
-    };
 
-    // ==== GQL FETCH ====
-    async function gqlFetch(query, variables = {}) {
-      const token = getAccess();
-      if (!token) {
-        log("❗ Нет access, зайди через телеграм или /auth/refresh");
-        throw new Error("no access");
-      }
-      const resp = await fetch(getBaseUrl() + "/graphql", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify({ query, variables })
-      });
-      const json = await resp.json();
-      if (!resp.ok || json.errors) {
-        log("❌ GraphQL error:", json);
-        throw json;
-      }
-      return json;
-    }
-
-    // ==== EVENT HANDLERS ====
-    document.getElementById("btn-save-base").onclick = saveBaseUrl;
-    document.getElementById("btn-clear-access").onclick = () => {
-      setAccess(null);
-      log("access очищен");
-    };
-
-    document.getElementById("btn-check-access").onclick = async () => {
-      try {
-        const data = await gqlFetch(`{ getPlayer { id username } }`);
-        log("✅ access работает:", data);
-      } catch (e) {
-        log("❌ access НЕ работает:", e);
-      }
-    };
-
-    // AUTH: refresh
-    document.getElementById("btn-refresh").onclick = async () => {
-      try {
-        const resp = await fetch(getBaseUrl() + "/auth/refresh", {
-          method: "POST",
-          credentials: "include",
-          headers: { "Accept": "application/json" }
+        btnLogout.addEventListener("click", function () {
+            callAuth("/auth/logout");
         });
-        const data = await resp.json();
-        if (!resp.ok) {
-          log("❌ refresh вернул", resp.status, data);
-          return;
-        }
-        if (data.accessToken) {
-          setAccess(data.accessToken);
-          log("✅ refresh: новый access получен");
-        } else {
-          log("❌ refresh: в ответе нет accessToken", data);
-        }
-      } catch (e) {
-        log("❌ ошибка refresh:", e);
-      }
-    };
-
-    // AUTH: check refresh — просто пробуем ещё раз
-    document.getElementById("btn-check-refresh").onclick = async () => {
-      const resp = await fetch(getBaseUrl() + "/auth/refresh", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Accept": "application/json" }
-      });
-      log("Проверка refresh → статус:", resp.status);
-      if (resp.ok) {
-        const data = await resp.json();
-        log("refresh OK, пришёл access:", data.accessToken);
-      } else {
-        log("refresh НЕ работает (нет куки / истёк)");
-      }
-    };
-
-    // GQL базовые
-    document.getElementById("btn-gql-player").onclick = async () => {
-      const data = await gqlFetch(`{ getPlayer { id username photoUrl meat gold brain boardColor houses { id type level locationX locationY skin } } }`);
-      log("getPlayer:", data);
-    };
-    document.getElementById("btn-gql-houses-cfg").onclick = async () => {
-      const data = await gqlFetch(`{ getHousesInfoCfg }`);
-      log("getHousesInfoCfg:", data);
-    };
-    document.getElementById("btn-gql-logic-cfg").onclick = async () => {
-      const data = await gqlFetch(`{ getGameLogicCfg }`);
-      log("getGameLogicCfg:", data);
-    };
-    document.getElementById("btn-gql-meat").onclick = async () => {
-      const data = await gqlFetch(`mutation { updatePlayerMeat { id username meat gold brain } }`);
-      log("updatePlayerMeat:", data);
-    };
-
-    // buildHouse
-    document.getElementById("btn-build").onclick = async () => {
-      const type = document.getElementById("build-type").value;
-      const skin = document.getElementById("build-skin").value || "default";
-      const x = Number(document.getElementById("build-x").value || 0);
-      const y = Number(document.getElementById("build-y").value || 0);
-      const q = `
-        mutation($input: BuildHouseInput!) {
-          buildHouse(input: $input) {
-            id type level skin locationX locationY
-          }
-        }
-      `;
-      const vars = { input: { type, skin, locationX: x, locationY: y } };
-      const data = await gqlFetch(q, vars);
-      log("buildHouse:", data);
-    };
-
-    // load houses
-    let currentHouses = [];
-    function fillHousesSelect() {
-      const sel = document.getElementById("sel-house");
-      sel.innerHTML = "";
-      if (!currentHouses.length) {
-        const opt = document.createElement("option");
-        opt.value = "";
-        opt.textContent = "(нет домов)";
-        sel.appendChild(opt);
-        return;
-      }
-      currentHouses.forEach(h => {
-        const opt = document.createElement("option");
-        opt.value = h.id;
-        opt.textContent = `${h.id} — ${h.type} lvl=${h.level} [${h.locationX},${h.locationY}] skin=${h.skin}`;
-        sel.appendChild(opt);
-      });
-    }
-
-    document.getElementById("btn-load-houses").onclick = async () => {
-      const data = await gqlFetch(`{ getPlayer { houses { id type level locationX locationY skin } } }`);
-      currentHouses = data.data.getPlayer.houses || [];
-      fillHousesSelect();
-      log("Список домов:", currentHouses);
-    };
-
-    // move
-    document.getElementById("btn-move").onclick = async () => {
-      const houseId = document.getElementById("sel-house").value;
-      if (!houseId) { log("❗ выбери дом"); return; }
-      const x = Number(document.getElementById("move-x").value || 0);
-      const y = Number(document.getElementById("move-y").value || 0);
-      const q = `
-        mutation($input: UpdateHouseLocationInput!) {
-          updateHouseLocation(input: $input) {
-            id locationX locationY
-          }
-        }
-      `;
-      const vars = { input: { houseId, newLocationX: x, newLocationY: y } };
-      const data = await gqlFetch(q, vars);
-      log("updateHouseLocation:", data);
-    };
-
-    // change skin
-    document.getElementById("btn-change-skin").onclick = async () => {
-      const houseId = document.getElementById("sel-house").value;
-      if (!houseId) { log("❗ выбери дом"); return; }
-      const newSkin = document.getElementById("skin-new").value || "default";
-      const q = `
-        mutation($input: UpdateHouseSkinInput!) {
-          updateHouseSkin(input: $input) {
-            id skin
-          }
-        }
-      `;
-      const data = await gqlFetch(q, { input: { houseId, newSkin } });
-      log("updateHouseSkin:", data);
-    };
-
-    // upgrade
-    document.getElementById("btn-upgrade").onclick = async () => {
-      const houseId = document.getElementById("sel-house").value;
-      if (!houseId) { log("❗ выбери дом"); return; }
-      const q = `
-        mutation($input: HouseIdInput!) {
-          updateHouseLevel(input: $input) {
-            id level
-          }
-        }
-      `;
-      const data = await gqlFetch(q, { input: { houseId } });
-      log("updateHouseLevel:", data);
-    };
-
-    // delete
-    document.getElementById("btn-delete").onclick = async () => {
-      const houseId = document.getElementById("sel-house").value;
-      if (!houseId) { log("❗ выбери дом"); return; }
-      const q = `
-        mutation($input: HouseIdInput!) {
-          removeHouse(input: $input) {
-            success
-            deletedHouseId
-          }
-        }
-      `;
-      const data = await gqlFetch(q, { input: { houseId } });
-      log("removeHouse:", data);
-    };
-
-    // convert meat -> brain
-    document.getElementById("btn-conv-meat").onclick = async () => {
-      const amount = Number(document.getElementById("conv-meat").value || 0);
-      const q = `
-        mutation($input: ConvertMeatToBrainInput!) {
-          convertMeatToBrain(input: $input) {
-            id meat brain gold
-          }
-        }
-      `;
-      const data = await gqlFetch(q, { input: { meatToSpend: amount } });
-      log("convertMeatToBrain:", data);
-    };
-
-    // convert brain -> gold
-    document.getElementById("btn-conv-brain").onclick = async () => {
-      const amount = Number(document.getElementById("conv-brain").value || 0);
-      const q = `
-        mutation($input: ConvertBrainToGoldInput!) {
-          convertBrainToGold(input: $input) {
-            id brain gold meat
-          }
-        }
-      `;
-      const data = await gqlFetch(q, { input: { brainToSpend: amount } });
-      log("convertBrainToGold:", data);
-    };
-
-    // reload
-    document.getElementById("btn-reload").onclick = () => location.reload();
-
-    // ==== INIT ====
-    loadBaseUrl();
-    renderAccess();
-    log("Клиент загружен. Меняй BASE URL если надо, авторизуйся через телеграм и жми кнопки.");
+    });
 </script>
-
 </body>
 </html>

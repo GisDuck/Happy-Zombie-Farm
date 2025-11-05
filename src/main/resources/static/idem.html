@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>HZFarm – GraphQL / Idempotency тесты</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #020617;
+            color: #e5e7eb;
+            margin: 0;
+            padding: 0;
+        }
+        a {
+            color: #38bdf8;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        h2 {
+            margin-top: 24px;
+            margin-bottom: 8px;
+        }
+        h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+        nav {
+            margin-bottom: 24px;
+        }
+        nav a, nav button {
+            display: inline-block;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid #334155;
+            background: #020617;
+            color: #e5e7eb;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        nav button:hover,
+        nav a:hover {
+            background: #1f2937;
+        }
+        button {
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid #334155;
+            background: #020617;
+            color: #e5e7eb;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        button:hover {
+            background: #1f2937;
+        }
+        section {
+            margin-bottom: 24px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .card {
+            padding: 14px 16px 16px;
+            border-radius: 16px;
+            background: rgba(15,23,42,0.95);
+            border: 1px solid #1f2937;
+        }
+        label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+        input, select, textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 6px 8px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            background: #020617;
+            color: #e5e7eb;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+        textarea {
+            min-height: 80px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            resize: vertical;
+        }
+        .row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+            margin-bottom: 4px;
+        }
+        .row > div {
+            flex: 1 1 120px;
+        }
+        pre {
+            background: #020617;
+            border-radius: 12px;
+            padding: 8px;
+            font-size: 12px;
+            max-height: 220px;
+            overflow: auto;
+        }
+        .small {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        .pill {
+            display: inline-block;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            border: 1px solid #1e293b;
+            background: rgba(15,23,42,0.9);
+            margin-left: 6px;
+        }
+        .houses-select {
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>HZFarm – GraphQL / Idempotency тесты</h1>
+    <p class="small">
+        Эта страница доступна только залогиненным пользователям (JWT в cookie). Здесь тестируем все query и mutation.
+    </p>
+
+    <nav>
+        <a href="/index.html">Вернуться на главную</a>
+        <a href="/idem.html">Перезагрузить /idem.html</a>
+    </nav>
+
+    <section>
+        <h2>Сервисная информация</h2>
+        <p class="small">
+            Все запросы к <code>/graphql</code> идут с заголовком
+            <code>Idempotency-Key</code> и, если есть, с <code>X-XSRF-TOKEN</code>.
+        </p>
+        <div class="row">
+            <div>
+                <button id="btn-show-csrf">Показать текущий CSRF (XSRF-TOKEN)</button>
+                <pre id="out-csrf"></pre>
+            </div>
+            <div>
+                <button id="btn-load-initial">Загрузить игрока и его дома</button>
+                <pre id="out-initial"></pre>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Query</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>getPlayer <span class="pill">Query</span></h3>
+                <button id="btn-get-player">Выполнить getPlayer</button>
+                <pre id="out-player"></pre>
+            </div>
+
+            <div class="card">
+                <h3>getPlayerHouses <span class="pill">Query</span></h3>
+                <button id="btn-get-houses">Выполнить getPlayerHouses</button>
+                <pre id="out-houses"></pre>
+            </div>
+
+            <div class="card">
+                <h3>getHouse(houseId) <span class="pill">Query</span></h3>
+                <label>
+                    houseId (ID)
+                    <input type="text" id="input-get-house-id" placeholder="введи ID дома или выбери ниже" />
+                </label>
+                <label class="small">
+                    или выбери из своих домов:
+                    <select id="select-get-house" class="houses-select">
+                        <option value="">— сначала загрузить getPlayerHouses —</option>
+                    </select>
+                </label>
+                <button id="btn-get-house">Выполнить getHouse</button>
+                <pre id="out-get-house"></pre>
+            </div>
+
+            <div class="card">
+                <h3>getHousesInfoCfg <span class="pill">Query</span></h3>
+                <button id="btn-get-houses-cfg">Выполнить getHousesInfoCfg</button>
+                <pre id="out-houses-cfg"></pre>
+            </div>
+
+            <div class="card">
+                <h3>getGameLogicCfg <span class="pill">Query</span></h3>
+                <button id="btn-get-game-logic">Выполнить getGameLogicCfg</button>
+                <pre id="out-game-logic"></pre>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Mutation – дома</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>buildHouse <span class="pill">Mutation</span></h3>
+                <div class="row">
+                    <div>
+                        <label>
+                            type (HouseType)
+                            <select id="build-type">
+                                <option value="FARM">FARM</option>
+                                <option value="DECOR">DECOR</option>
+                                <option value="STORAGE">STORAGE</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            skin (String)
+                            <input type="text" id="build-skin" placeholder="skin id / имя" />
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div>
+                        <label>
+                            locationX (Int)
+                            <input type="number" id="build-x" value="0" />
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            locationY (Int)
+                            <input type="number" id="build-y" value="0" />
+                        </label>
+                    </div>
+                </div>
+                <button id="btn-build-house">Вызвать buildHouse</button>
+                <pre id="out-build-house"></pre>
+            </div>
+
+            <div class="card">
+                <h3>updateHouseLevel <span class="pill">Mutation</span></h3>
+                <label>
+                    Дом:
+                    <select id="select-update-level" class="houses-select">
+                        <option value="">— сначала загрузить getPlayerHouses —</option>
+                    </select>
+                </label>
+                <button id="btn-update-level">Повысить уровень дома</button>
+                <pre id="out-update-level"></pre>
+            </div>
+
+            <div class="card">
+                <h3>updateHouseSkin <span class="pill">Mutation</span></h3>
+                <label>
+                    Дом:
+                    <select id="select-update-skin" class="houses-select">
+                        <option value="">— сначала загрузить getPlayerHouses —</option>
+                    </select>
+                </label>
+                <label>
+                    newSkin (String)
+                    <input type="text" id="input-update-skin" placeholder="новый skin" />
+                </label>
+                <button id="btn-update-skin">Обновить скин</button>
+                <pre id="out-update-skin"></pre>
+            </div>
+
+            <div class="card">
+                <h3>updateHouseLocation <span class="pill">Mutation</span></h3>
+                <label>
+                    Дом:
+                    <select id="select-update-location" class="houses-select">
+                        <option value="">— сначала загрузить getPlayerHouses —</option>
+                    </select>
+                </label>
+                <div class="row">
+                    <div>
+                        <label>
+                            newLocationX (Int)
+                            <input type="number" id="input-new-x" value="0" />
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            newLocationY (Int)
+                            <input type="number" id="input-new-y" value="0" />
+                        </label>
+                    </div>
+                </div>
+                <button id="btn-update-location">Обновить координаты</button>
+                <pre id="out-update-location"></pre>
+            </div>
+
+            <div class="card">
+                <h3>removeHouse <span class="pill">Mutation</span></h3>
+                <label>
+                    Дом:
+                    <select id="select-remove-house" class="houses-select">
+                        <option value="">— сначала загрузить getPlayerHouses —</option>
+                    </select>
+                </label>
+                <button id="btn-remove-house">Удалить дом</button>
+                <pre id="out-remove-house"></pre>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Mutation – ресурсы игрока</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>updatePlayerMeat <span class="pill">Mutation</span></h3>
+                <p class="small">
+                    Вызывает <code>updatePlayerMeat</code> без входных параметров.
+                </p>
+                <button id="btn-update-player-meat">Вызвать updatePlayerMeat</button>
+                <pre id="out-update-player-meat"></pre>
+            </div>
+
+            <div class="card">
+                <h3>convertMeatToBrain <span class="pill">Mutation</span></h3>
+                <label>
+                    meatToSpend (Long)
+                    <input type="number" id="input-meat-to-brain" value="0" />
+                </label>
+                <button id="btn-convert-meat">Сконвертировать мясо → мозги</button>
+                <pre id="out-convert-meat"></pre>
+            </div>
+
+            <div class="card">
+                <h3>convertBrainToGold <span class="pill">Mutation</span></h3>
+                <label>
+                    brainToSpend (Long)
+                    <input type="number" id="input-brain-to-gold" value="0" />
+                </label>
+                <button id="btn-convert-brain">Сконвертировать мозги → золото</button>
+                <pre id="out-convert-brain"></pre>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Произвольный GraphQL-запрос</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>GraphQL</h3>
+                <label>
+                    Тело запроса
+                    <textarea id="custom-query">query GetPlayer {
+  getPlayer {
+    id
+    username
+    meat
+    brain
+    gold
+    boardColor
+  }
+}</textarea>
+                </label>
+                <label>
+                    variables (JSON)
+                    <textarea id="custom-variables">{}</textarea>
+                </label>
+                <button id="btn-run-custom">Выполнить произвольный запрос</button>
+            </div>
+            <div class="card">
+                <h3>Ответ</h3>
+                <pre id="out-custom"></pre>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    let housesCache = [];
+    let playerCache = null;
+
+    function getCookie(name) {
+        const matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([.$?*|{}()\\[\\]\\\\\\/\\+^])/g, "\\$1") + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : null;
+    }
+
+    function getCsrfToken() {
+        return getCookie("XSRF-TOKEN");
+    }
+
+    function generateIdempotencyKey() {
+        if (window.crypto && window.crypto.randomUUID) {
+            return window.crypto.randomUUID();
+        }
+        return "idem-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+    }
+
+    function pretty(obj) {
+        try {
+            return JSON.stringify(obj, null, 2);
+        } catch (e) {
+            return String(obj);
+        }
+    }
+
+    async function callGraphQL(query, variables, description) {
+        const key = generateIdempotencyKey();
+        const csrf = getCsrfToken();
+
+        const headers = {
+            "Content-Type": "application/json",
+            "Idempotency-Key": key
+        };
+        if (csrf) {
+            headers["X-XSRF-TOKEN"] = csrf;
+        }
+
+        const body = JSON.stringify({
+            query: query,
+            variables: variables || {}
+        });
+
+        const meta = {
+            description: description || "",
+            idempotencyKey: key,
+            hasCsrf: !!csrf,
+            body: JSON.parse(body)
+        };
+
+        try {
+            const resp = await fetch("/graphql", {
+                method: "POST",
+                headers: headers,
+                credentials: "include",
+                body: body
+            });
+
+            const text = await resp.text();
+            let json;
+            try {
+                json = JSON.parse(text);
+            } catch (e) {
+                json = null;
+            }
+
+            return {
+                ok: resp.ok,
+                status: resp.status,
+                statusText: resp.statusText,
+                json: json,
+                rawText: text,
+                meta: meta
+            };
+        } catch (e) {
+            return {
+                ok: false,
+                status: 0,
+                statusText: "NETWORK_ERROR",
+                json: null,
+                rawText: String(e),
+                meta: meta
+            };
+        }
+    }
+
+    function populateHouseSelects() {
+        const selects = document.querySelectorAll(".houses-select");
+        selects.forEach(select => {
+            const current = select.value;
+            select.innerHTML = "";
+            if (!housesCache || housesCache.length === 0) {
+                const opt = document.createElement("option");
+                opt.value = "";
+                opt.textContent = "— домов нет, сначала сделайте buildHouse —";
+                select.appendChild(opt);
+                return;
+            }
+            const placeholder = document.createElement("option");
+            placeholder.value = "";
+            placeholder.textContent = "— выбери дом —";
+            select.appendChild(placeholder);
+
+            housesCache.forEach(h => {
+                const opt = document.createElement("option");
+                opt.value = h.id;
+                opt.textContent = "#" + h.id + " • " + h.type + " • lvl " + h.level + " • (" + h.locationX + "," + h.locationY + ")";
+                select.appendChild(opt);
+            });
+
+            const hasCurrent = Array.from(select.options).some(o => o.value === current);
+            if (hasCurrent) {
+                select.value = current;
+            }
+        });
+    }
+
+    async function doGetPlayer() {
+        const query = `query GetPlayer {
+  getPlayer {
+    id
+    username
+    photoUrl
+    meat
+    gold
+    brain
+    boardColor
+  }
+}`;
+        const res = await callGraphQL(query, {}, "getPlayer");
+        if (res.json && res.json.data && res.json.data.getPlayer) {
+            playerCache = res.json.data.getPlayer;
+        }
+        document.getElementById("out-player").textContent = pretty(res);
+        document.getElementById("out-initial").textContent = pretty({
+            player: playerCache
+        });
+    }
+
+    async function doGetPlayerHouses() {
+        const query = `query GetPlayerHouses {
+  getPlayerHouses {
+    id
+    type
+    level
+    skin
+    locationX
+    locationY
+  }
+}`;
+        const res = await callGraphQL(query, {}, "getPlayerHouses");
+        if (res.json && res.json.data && res.json.data.getPlayerHouses) {
+            housesCache = res.json.data.getPlayerHouses;
+            populateHouseSelects();
+        }
+        document.getElementById("out-houses").textContent = pretty(res);
+        document.getElementById("out-initial").textContent = pretty({
+            player: playerCache,
+            houses: housesCache
+        });
+    }
+
+    async function doGetHouse() {
+        const inputEl = document.getElementById("input-get-house-id");
+        const selectEl = document.getElementById("select-get-house");
+        const rawId = inputEl.value || selectEl.value;
+        if (!rawId) {
+            alert("Сначала выбери дом или введи houseId");
+            return;
+        }
+        const vars = { houseId: rawId };
+        const query = `query GetHouse($houseId: ID!) {
+  getHouse(houseId: $houseId) {
+    id
+    type
+    level
+    skin
+    locationX
+    locationY
+  }
+}`;
+        const res = await callGraphQL(query, vars, "getHouse");
+        document.getElementById("out-get-house").textContent = pretty(res);
+    }
+
+    async function doGetHousesInfoCfg() {
+        const query = `query GetHousesInfoCfg {
+  getHousesInfoCfg
+}`;
+        const res = await callGraphQL(query, {}, "getHousesInfoCfg");
+        document.getElementById("out-houses-cfg").textContent = pretty(res);
+    }
+
+    async function doGetGameLogicCfg() {
+        const query = `query GetGameLogicCfg {
+  getGameLogicCfg
+}`;
+        const res = await callGraphQL(query, {}, "getGameLogicCfg");
+        document.getElementById("out-game-logic").textContent = pretty(res);
+    }
+
+    async function doBuildHouse() {
+        const type = document.getElementById("build-type").value;
+        const skin = document.getElementById("build-skin").value || "default";
+        const x = parseInt(document.getElementById("build-x").value, 10) || 0;
+        const y = parseInt(document.getElementById("build-y").value, 10) || 0;
+
+        const vars = {
+            input: {
+                type: type,
+                skin: skin,
+                locationX: x,
+                locationY: y
+            }
+        };
+
+        const query = `mutation BuildHouse($input: BuildHouseInput!) {
+  buildHouse(input: $input) {
+    id
+    type
+    level
+    skin
+    locationX
+    locationY
+  }
+}`;
+        const res = await callGraphQL(query, vars, "buildHouse");
+        document.getElementById("out-build-house").textContent = pretty(res);
+
+        await doGetPlayerHouses();
+    }
+
+    async function doUpdateHouseLevel() {
+        const select = document.getElementById("select-update-level");
+        const houseId = select.value;
+        if (!houseId) {
+            alert("Сначала выбери дом");
+            return;
+        }
+        const vars = {
+            input: {
+                houseId: houseId
+            }
+        };
+        const query = `mutation UpdateHouseLevel($input: HouseIdInput!) {
+  updateHouseLevel(input: $input) {
+    id
+    level
+    type
+    skin
+    locationX
+    locationY
+  }
+}`;
+        const res = await callGraphQL(query, vars, "updateHouseLevel");
+        document.getElementById("out-update-level").textContent = pretty(res);
+        await doGetPlayerHouses();
+    }
+
+    async function doUpdateHouseSkin() {
+        const select = document.getElementById("select-update-skin");
+        const houseId = select.value;
+        const newSkin = document.getElementById("input-update-skin").value;
+        if (!houseId) {
+            alert("Сначала выбери дом");
+            return;
+        }
+        if (!newSkin) {
+            alert("Введи newSkin");
+            return;
+        }
+
+        const vars = {
+            input: {
+                houseId: houseId,
+                newSkin: newSkin
+            }
+        };
+
+        const query = `mutation UpdateHouseSkin($input: UpdateHouseSkinInput!) {
+  updateHouseSkin(input: $input) {
+    id
+    type
+    level
+    skin
+    locationX
+    locationY
+  }
+}`;
+        const res = await callGraphQL(query, vars, "updateHouseSkin");
+        document.getElementById("out-update-skin").textContent = pretty(res);
+        await doGetPlayerHouses();
+    }
+
+    async function doUpdateHouseLocation() {
+        const select = document.getElementById("select-update-location");
+        const houseId = select.value;
+        const newX = parseInt(document.getElementById("input-new-x").value, 10);
+        const newY = parseInt(document.getElementById("input-new-y").value, 10);
+
+        if (!houseId) {
+            alert("Сначала выбери дом");
+            return;
+        }
+        if (Number.isNaN(newX) || Number.isNaN(newY)) {
+            alert("Введи корректные координаты");
+            return;
+        }
+
+        const vars = {
+            input: {
+                houseId: houseId,
+                newLocationX: newX,
+                newLocationY: newY
+            }
+        };
+
+        const query = `mutation UpdateHouseLocation($input: UpdateHouseLocationInput!) {
+  updateHouseLocation(input: $input) {
+    id
+    type
+    level
+    skin
+    locationX
+    locationY
+  }
+}`;
+        const res = await callGraphQL(query, vars, "updateHouseLocation");
+        document.getElementById("out-update-location").textContent = pretty(res);
+        await doGetPlayerHouses();
+    }
+
+    async function doRemoveHouse() {
+        const select = document.getElementById("select-remove-house");
+        const houseId = select.value;
+        if (!houseId) {
+            alert("Сначала выбери дом");
+            return;
+        }
+        if (!confirm("Удалить дом #" + houseId + "?")) {
+            return;
+        }
+
+        const vars = {
+            input: {
+                houseId: houseId
+            }
+        };
+
+        const query = `mutation RemoveHouse($input: HouseIdInput!) {
+  removeHouse(input: $input) {
+    success
+  }
+}`;
+        const res = await callGraphQL(query, vars, "removeHouse");
+        document.getElementById("out-remove-house").textContent = pretty(res);
+        await doGetPlayerHouses();
+    }
+
+    async function doUpdatePlayerMeat() {
+        const query = `mutation UpdatePlayerMeat {
+  updatePlayerMeat {
+    id
+    meat
+    gold
+    brain
+  }
+}`;
+        const res = await callGraphQL(query, {}, "updatePlayerMeat");
+        document.getElementById("out-update-player-meat").textContent = pretty(res);
+    }
+
+    async function doConvertMeatToBrain() {
+        const amount = parseInt(document.getElementById("input-meat-to-brain").value, 10);
+        if (Number.isNaN(amount) || amount <= 0) {
+            alert("Введи положительное число в meatToSpend");
+            return;
+        }
+
+        const vars = {
+            input: {
+                meatToSpend: amount
+            }
+        };
+
+        const query = `mutation ConvertMeatToBrain($input: ConvertMeatToBrainInput!) {
+  convertMeatToBrain(input: $input) {
+    id
+    meat
+    gold
+    brain
+  }
+}`;
+        const res = await callGraphQL(query, vars, "convertMeatToBrain");
+        document.getElementById("out-convert-meat").textContent = pretty(res);
+    }
+
+    async function doConvertBrainToGold() {
+        const amount = parseInt(document.getElementById("input-brain-to-gold").value, 10);
+        if (Number.isNaN(amount) || amount <= 0) {
+            alert("Введи положительное число в brainToSpend");
+            return;
+        }
+
+        const vars = {
+            input: {
+                brainToSpend: amount
+            }
+        };
+
+        const query = `mutation ConvertBrainToGold($input: ConvertBrainToGoldInput!) {
+  convertBrainToGold(input: $input) {
+    id
+    meat
+    gold
+    brain
+  }
+}`;
+        const res = await callGraphQL(query, vars, "convertBrainToGold");
+        document.getElementById("out-convert-brain").textContent = pretty(res);
+    }
+
+    async function doRunCustom() {
+        const query = document.getElementById("custom-query").value;
+        let variables = {};
+        const rawVars = document.getElementById("custom-variables").value.trim();
+        if (rawVars) {
+            try {
+                variables = JSON.parse(rawVars);
+            } catch (e) {
+                alert("variables невалидный JSON");
+                return;
+            }
+        }
+        const res = await callGraphQL(query, variables, "custom");
+        document.getElementById("out-custom").textContent = pretty(res);
+    }
+
+    function showCsrf() {
+        const token = getCsrfToken();
+        document.getElementById("out-csrf").textContent = pretty({
+            "XSRF-TOKEN": token
+        });
+    }
+
+    async function loadInitial() {
+        const res1 = await doGetPlayer();
+        const res2 = await doGetPlayerHouses();
+        document.getElementById("out-initial").textContent = pretty({
+            player: playerCache,
+            houses: housesCache
+        });
+        return { res1, res2 };
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("btn-show-csrf").addEventListener("click", showCsrf);
+        document.getElementById("btn-load-initial").addEventListener("click", async function () {
+            const result = await loadInitial();
+            document.getElementById("out-initial").textContent = pretty({
+                player: playerCache,
+                houses: housesCache
+            });
+        });
+
+        document.getElementById("btn-get-player").addEventListener("click", doGetPlayer);
+        document.getElementById("btn-get-houses").addEventListener("click", doGetPlayerHouses);
+        document.getElementById("btn-get-house").addEventListener("click", doGetHouse);
+        document.getElementById("btn-get-houses-cfg").addEventListener("click", doGetHousesInfoCfg);
+        document.getElementById("btn-get-game-logic").addEventListener("click", doGetGameLogicCfg);
+
+        document.getElementById("btn-build-house").addEventListener("click", doBuildHouse);
+        document.getElementById("btn-update-level").addEventListener("click", doUpdateHouseLevel);
+        document.getElementById("btn-update-skin").addEventListener("click", doUpdateHouseSkin);
+        document.getElementById("btn-update-location").addEventListener("click", doUpdateHouseLocation);
+        document.getElementById("btn-remove-house").addEventListener("click", doRemoveHouse);
+
+        document.getElementById("btn-update-player-meat").addEventListener("click", doUpdatePlayerMeat);
+        document.getElementById("btn-convert-meat").addEventListener("click", doConvertMeatToBrain);
+        document.getElementById("btn-convert-brain").addEventListener("click", doConvertBrainToGold);
+
+        document.getElementById("btn-run-custom").addEventListener("click", doRunCustom);
+
+        // По умолчанию сразу попробуем загрузить игрока и дома
+        loadInitial().then(() => {
+            document.getElementById("out-initial").textContent = pretty({
+                player: playerCache,
+                houses: housesCache
+            });
+        }).catch(() => {
+            // если упало (например, нет авторизации) — просто молча игнорируем
+        });
+    });
+</script>
+</body>
+</html>
