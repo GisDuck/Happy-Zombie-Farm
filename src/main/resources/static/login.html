@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HZFarm — тест авторизации</title>
+  <link rel="stylesheet" href="css/test-client.css" />
+</head>
+<body>
+  <header class="page-header">
+    <h1>HZFarm • Тест авторизации</h1>
+    <div class="page-header__subtitle">Логин, управление токенами и проверка доступа к GraphQL.</div>
+  </header>
+
+  <main class="layout-grid">
+    <section class="card card--span-4">
+      <div class="card__title">BASE URL и статус</div>
+      <div class="field">
+        <label for="baseUrl">BASE URL (сохраняется в localStorage)</label>
+        <input id="baseUrl" type="text" placeholder="https://example.com" data-el="base-input" />
+      </div>
+      <div class="section-divider"></div>
+      <div class="info-line">
+        <span class="tag">Текущий сервер</span>
+        <strong data-el="base-display"></strong>
+      </div>
+      <div class="divider-dashed"></div>
+      <div class="status-pill" data-el="status">
+        <span class="status-pill__dot"></span>
+        <span>Ожидается вход</span>
+      </div>
+    </section>
+
+    <section class="card card--span-4">
+      <div class="card__title">Вход через Telegram</div>
+      <div class="card__subtitle">Используйте официальный Telegram Login Widget для авторизации.</div>
+      <div class="telegram-widget" data-el="telegram-widget">
+        <div class="telegram-widget__button" data-el="telegram-widget-button">
+          <script>
+            window.__pendingTelegramUsers = window.__pendingTelegramUsers || [];
+            window.onTelegramAuth = function onTelegramAuth(user) {
+              if (window.__handleTelegramAuth) {
+                window.__handleTelegramAuth(user);
+              } else {
+                window.__pendingTelegramUsers.push(user);
+                console.log('Telegram auth payload received before init', user);
+              }
+            };
+          </script>
+          <script
+            async
+            src="https://telegram.org/js/telegram-widget.js?22"
+            data-telegram-login="hzfarm_bot"
+            data-size="large"
+            data-request-access="write"
+            data-onauth="onTelegramAuth(user)"
+          ></script>
+        </div>
+        <div class="telegram-widget__info">
+          <div class="info-line">
+            <span class="tag">Последний payload</span>
+            <span data-el="widget-preview">(нет данных)</span>
+          </div>
+          <p class="small-text">
+            После успешного входа accessToken появится в карточке ниже. Для повторного входа достаточно
+            снова нажать кнопку «Login with Telegram».
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card card--span-4">
+      <div class="card__title">Ручной ввод данных (опционально)</div>
+      <div class="card__subtitle">Данные автоматически подставляются после авторизации через Telegram.</div>
+      <form class="field-group" data-el="login-form">
+        <div class="inline-fields">
+          <div class="field">
+            <label for="tgId">Telegram ID</label>
+            <input id="tgId" name="id" type="number" placeholder="123456" required />
+          </div>
+          <div class="field">
+            <label for="tgUsername">Username</label>
+            <input id="tgUsername" name="username" type="text" placeholder="hzfarm" />
+          </div>
+        </div>
+        <div class="inline-fields">
+          <div class="field">
+            <label for="tgFirstName">Имя</label>
+            <input id="tgFirstName" name="firstName" type="text" />
+          </div>
+          <div class="field">
+            <label for="tgLastName">Фамилия</label>
+            <input id="tgLastName" name="lastName" type="text" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="tgPhoto">photoUrl</label>
+          <input id="tgPhoto" name="photoUrl" type="text" placeholder="https://t.me/i/userpic" />
+        </div>
+        <div class="inline-fields">
+          <div class="field">
+            <label for="tgAuthDate">authDate (unix)</label>
+            <input id="tgAuthDate" name="authDate" type="number" placeholder="1692201000" />
+          </div>
+          <div class="field">
+            <label for="tgHash">hash</label>
+            <input id="tgHash" name="hash" type="text" placeholder="подпись telegram" required />
+          </div>
+        </div>
+        <button class="btn" type="submit" data-el="login-button" data-loading-text="Входим…">Войти</button>
+      </form>
+    </section>
+
+    <section class="card card--span-4">
+      <div class="card__title">Быстрый ввод payload</div>
+      <div class="card__subtitle">Вставьте JSON или строку initData от Telegram.</div>
+      <div class="field">
+        <label for="rawPayload">Payload</label>
+        <textarea id="rawPayload" data-el="raw-payload" placeholder='{"id":123,"username":"hzfarm","hash":"..."}'></textarea>
+      </div>
+      <div class="button-row">
+        <button class="btn" type="button" data-el="login-raw" data-loading-text="Отправляем…">Отправить payload</button>
+      </div>
+      <p class="small-text">Строка будет автоматически преобразована в JSON.</p>
+    </section>
+
+    <section class="card card--span-4">
+      <div class="card__title">Токены и дополнительные действия</div>
+      <div class="field">
+        <label for="manualToken">accessToken (опционально вручную)</label>
+        <input id="manualToken" type="text" data-el="manual-token" placeholder="Bearer token" />
+      </div>
+      <div class="button-row">
+        <button class="btn btn--ghost" type="button" data-el="save-token">Сохранить</button>
+        <button class="btn btn--ghost" type="button" data-el="clear-token">Очистить</button>
+      </div>
+      <div class="section-divider"></div>
+      <div class="button-row">
+        <button class="btn" type="button" data-el="refresh-button" data-loading-text="Обновляем…">POST /auth/refresh</button>
+        <button class="btn btn--danger" type="button" data-el="logout-button" data-loading-text="Выходим…">POST /auth/logout</button>
+      </div>
+      <div class="button-row">
+        <button class="btn" type="button" data-el="check-access" data-loading-text="Проверяем…">Проверить getPlayer</button>
+      </div>
+      <div class="divider-dashed"></div>
+      <div class="field">
+        <label>accessToken</label>
+        <div class="info-line">
+          <span class="tag">preview</span>
+          <span data-el="token-preview">(нет)</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>CSRF token</label>
+        <div class="info-line">
+          <span data-el="csrf-value">(нет)</span>
+          <button class="btn btn--ghost" type="button" data-el="copy-csrf">Копировать</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card card--span-12">
+      <div class="card__title">Лог</div>
+      <pre class="log-area" data-el="log"></pre>
+    </section>
+  </main>
+
+  <script type="module" src="js/pages/login-page.js"></script>
+</body>
+</html>
