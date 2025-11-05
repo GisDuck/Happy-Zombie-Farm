@@ -34,6 +34,7 @@ public class SecurityConfig {
                     // REST логин можно
                     .requestMatchers("/auth/**").permitAll()
                     .requestMatchers("/", "/index", "/index.html").permitAll()
+                    .requestMatchers("/login", "/login.html").permitAll()
                     // всё остальное — только с токеном
                     .anyRequest().authenticated()
             )
