@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
@@ -21,6 +22,7 @@ import java.util.HexFormat;
 import java.io.IOException;
 import java.util.Optional;
 
+@Slf4j
 @Component
 public class IdempotencyFilter extends OncePerRequestFilter {
 
@@ -51,6 +53,11 @@ public class IdempotencyFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String idempotencyKey = request.getHeader("Idempotency-Key");
+
+        log.info("IdempotencyFilter: {} {} key={}",
+                request.getMethod(),
+                request.getRequestURI(),
+                idempotencyKey);
 
         String playerId = "anonymous";
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
