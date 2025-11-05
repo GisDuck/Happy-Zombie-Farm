@@ -429,7 +429,7 @@
             "Idempotency-Key": key
         };
         if (csrf) {
-            headers["X-XSRF-TOKEN"] = csrf;
+            headers["X-CSRF-TOKEN"] = csrf;
         }
 
         const body = JSON.stringify({

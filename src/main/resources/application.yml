@@ -73,6 +73,7 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.springframework.graphql: DEBUG
+    org.springframework.security.web.csrf: DEBUG
   file:
     name: logs/hz_farm.log
   pattern:
