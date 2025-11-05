@@ -2,16 +2,17 @@ package game.Happy_Zombie_Farm.controller;
 
 import game.Happy_Zombie_Farm.dto.PlayerDto;
 import game.Happy_Zombie_Farm.dto.TelegramAuthDto;
-import game.Happy_Zombie_Farm.dto.outputDto.AuthPayloadDto;
 import game.Happy_Zombie_Farm.entity.Player;
 import game.Happy_Zombie_Farm.entity.UserAuth;
 import game.Happy_Zombie_Farm.exception.TelegramDataNotValidException;
 import game.Happy_Zombie_Farm.mapper.PlayerMapper;
 import game.Happy_Zombie_Farm.repository.PlayerRepository;
+import game.Happy_Zombie_Farm.security.JwtProperties;
 import game.Happy_Zombie_Farm.security.JwtService;
 import game.Happy_Zombie_Farm.service.AuthService;
 import game.Happy_Zombie_Farm.service.PlayerService;
 import game.Happy_Zombie_Farm.service.TelegramAuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Duration;
 import java.util.Optional;
 
 @Slf4j
@@ -33,6 +33,8 @@ public class AuthController {
     @Autowired
     private JwtService jwtService;
     @Autowired
+    private JwtProperties jwtProperties;
+    @Autowired
     private PlayerMapper playerMapper;
     @Autowired
     private PlayerService playerService;
@@ -40,8 +42,6 @@ public class AuthController {
     private PlayerRepository playerRepository;
     @Autowired
     private AuthService authService;
-
-    private static final String REFRESH_COOKIE = "HZF_REFRESH";
 
 //    @GetMapping
 //    public ResponseEntity<Resource> getAuthScript() {
@@ -56,7 +56,7 @@ public class AuthController {
      */
     @PostMapping("/telegram-login")
     @Transactional
-    public ResponseEntity<AuthPayloadDto> login(@RequestBody TelegramAuthDto telegramAuthDto,
+    public ResponseEntity<Void> login(@RequestBody TelegramAuthDto telegramAuthDto,
                                                HttpServletResponse response) {
         if (telegramAuthService.telegramDataIsValid(telegramAuthDto)) {
             Optional<UserAuth> optionalUserAuth = authService.getOptionalUserAuthByTelegramId(telegramAuthDto.id());
@@ -73,21 +73,26 @@ public class AuthController {
             String accessToken = jwtService.generateAccessToken(player.getId(), player.getUsername());
             String refreshToken = jwtService.generateRefreshToken(player.getId());
 
-            // 3. возвращаем access в теле
-            ResponseCookie cookie = ResponseCookie.from(REFRESH_COOKIE, refreshToken)
+            ResponseCookie accessCookie = ResponseCookie.from(jwtProperties.getAccessCookieName(), accessToken)
                     .httpOnly(true)
                     .secure(true)
                     .path("/")
-                    .maxAge(Duration.ofDays(14))
+                    .maxAge(jwtProperties.getAccessExpirationMs())
                     .sameSite("Lax")
                     .build();
-            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-            AuthPayloadDto dto = new AuthPayloadDto(playerMapper.toDto(player), accessToken);
+            ResponseCookie refreshCookie = ResponseCookie.from(jwtProperties.getRefreshCookieName(), refreshToken)
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/auth") // refresh ходит только под /auth/*
+                    .maxAge(jwtProperties.getRefreshExpirationMs())
+                    .sameSite("Lax")
+                    .build();
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                    .body(dto);
+            response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+            response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+            return ResponseEntity.ok().build();
         } else {
             throw new TelegramDataNotValidException(telegramAuthDto.id());
         }
@@ -98,10 +103,12 @@ public class AuthController {
      * Мы смотрим refresh в cookie и если он ок — выдаём новый access.
      */
     @PostMapping("/refresh")
-    public ResponseEntity<AuthPayloadDto> refresh(
-            @CookieValue(name = REFRESH_COOKIE, required = false) String refreshToken,
+    @Transactional
+    public ResponseEntity<Void> refresh(
+            HttpServletRequest request,
             HttpServletResponse response
     ) {
+        String refreshToken = extractCookie(request, jwtProperties.getRefreshCookieName());
         if (refreshToken == null) {
             return ResponseEntity.status(401).build();
         }
@@ -112,31 +119,60 @@ public class AuthController {
                 return ResponseEntity.status(401).build();
             }
 
+//            ДОБАВИТЬ ПРОВЕРКУ РЕФРЕША НА НАЛИЧИЕ В БАЗЕ И ЕСЛИ ОН ЕСТЬ ВЫДАВАТЬ ОШИБКУ ЧТО СТАРЫЙ ТОКЕН
+
             Long playerId = jwtService.extractPlayerId(refreshToken);
             PlayerDto playerDto = playerService.getPlayerDto(playerId);
 
             String newAccessToken = jwtService.generateAccessToken(playerDto.id(), playerDto.username());
+            String newRefreshToken = jwtService.generateRefreshToken(playerDto.id());
 
-            // Обновим для рефреш время жизни
-            ResponseCookie cookie = ResponseCookie.from(REFRESH_COOKIE, refreshToken)
+            ResponseCookie accessCookie = ResponseCookie.from(jwtProperties.getAccessCookieName(), newAccessToken)
                     .httpOnly(true)
                     .secure(true)
                     .path("/")
-                    .maxAge(Duration.ofDays(14))
+                    .maxAge(jwtProperties.getAccessExpirationMs())
                     .sameSite("Lax")
                     .build();
-            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-            AuthPayloadDto dto = new AuthPayloadDto(playerDto, newAccessToken);
+            ResponseCookie refreshCookie = ResponseCookie.from(jwtProperties.getRefreshCookieName(), newRefreshToken)
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/auth") // refresh ходит только под /auth/*
+                    .maxAge(jwtProperties.getRefreshExpirationMs())
+                    .sameSite("Lax")
+                    .build();
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                    .body(dto);
+            response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+            response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+            return ResponseEntity.ok().build();
 
         } catch (Exception e) {
             // подпись не сошлась / истёк / не refresh
             return ResponseEntity.status(401).build();
         }
+
+    }
+
+    @PostMapping("/logout")
+    @Transactional
+    public ResponseEntity<Void> logout(HttpServletResponse response) {
+        ResponseCookie accessCookie = ResponseCookie.from(jwtProperties.getAccessCookieName(), "")
+                .httpOnly(true).secure(true).path("/").maxAge(0).sameSite("Lax").build();
+        ResponseCookie refreshCookie = ResponseCookie.from(jwtProperties.getRefreshCookieName(), "")
+                .httpOnly(true).secure(true).path("/auth").maxAge(0).sameSite("Lax").build();
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+        return ResponseEntity.ok().build();
+    }
+
+    private String extractCookie(HttpServletRequest request, String name) {
+        if (request.getCookies() == null) return null;
+        for (jakarta.servlet.http.Cookie c : request.getCookies()) {
+            if (name.equals(c.getName())) return c.getValue();
+        }
+        return null;
     }
 
 
