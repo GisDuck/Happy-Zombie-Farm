@@ -109,6 +109,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             String refreshToken = resolveRefreshToken(request);
 
+            log.info("JwtAuthFilter: try get html with refreshToken={} path={}",
+                    refreshToken, request.getRequestURI());
+
             if (refreshToken != null
                     && jwtService.isTokenValid(refreshToken)
                     && jwtService.isRefreshToken(refreshToken)) {
