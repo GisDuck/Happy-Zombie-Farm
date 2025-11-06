@@ -30,8 +30,8 @@ jobs:
           host: hzfarm.ru
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "build/libs/*.jar"
-          target: "/root/app"
+          source: "build/libs/*.jar, docker-compose.yaml"
+          target: "app"
 
       - name: run Docker on remote server
         uses: appleboy/ssh-action@v0.1.10
