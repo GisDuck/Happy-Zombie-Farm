@@ -426,11 +426,9 @@
 
         const headers = {
             "Content-Type": "application/json",
-            "Idempotency-Key": key
+            "Idempotency-Key": key,
+            "X-XSRF-TOKEN": csrf
         };
-        if (csrf) {
-            headers["X-CSRF-TOKEN"] = csrf;
-        }
 
         const body = JSON.stringify({
             query: query,
@@ -440,7 +438,7 @@
         const meta = {
             description: description || "",
             idempotencyKey: key,
-            hasCsrf: !!csrf,
+            hasCsrf: true,
             body: JSON.parse(body)
         };
 
