@@ -7,7 +7,8 @@ import graphql.schema.DataFetchingEnvironment;
 import org.springframework.graphql.data.method.annotation.GraphQlExceptionHandler;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.util.Map;
 
 @ControllerAdvice
 public class GraphqlExceptionHandler {
@@ -22,9 +23,14 @@ public class GraphqlExceptionHandler {
     })
     public GraphQLError handleGameErrors(RuntimeException ex,
                                         DataFetchingEnvironment env) {
+        String errorCode = ex.getClass().getSimpleName();
+
         return GraphqlErrorBuilder.newError(env)
                 .message(ex.getMessage())
                 .errorType(ErrorType.BAD_REQUEST)
+                .extensions(Map.of(
+                        "code", errorCode
+                ))
                 .build();
     }
 }
