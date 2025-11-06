@@ -62,7 +62,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
         String playerId = "anonymous";
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getPrincipal() instanceof PlayerPrincipal p) {
-            playerId = String.valueOf(p.getPlayerId());
+            playerId = String.valueOf(p.playerId());
         }
 
         String redisKey = "idem:" + playerId + ":" + idempotencyKey;

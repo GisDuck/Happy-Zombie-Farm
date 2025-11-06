@@ -70,27 +70,10 @@ public class AuthController {
                 playerRepository.save(player);
             }
 
-            String accessToken = jwtService.generateAccessToken(player.getId(), player.getUsername());
+            String accessToken = jwtService.generateAccessToken(player.getId());
             String refreshToken = jwtService.generateRefreshToken(player.getId());
 
-            ResponseCookie accessCookie = ResponseCookie.from(jwtProperties.getAccessCookieName(), accessToken)
-                    .httpOnly(true)
-                    .secure(true)
-                    .path("/")
-                    .maxAge(jwtProperties.getAccessExpirationMs())
-                    .sameSite("Lax")
-                    .build();
-
-            ResponseCookie refreshCookie = ResponseCookie.from(jwtProperties.getRefreshCookieName(), refreshToken)
-                    .httpOnly(true)
-                    .secure(true)
-                    .path("/auth") // refresh ходит только под /auth/*
-                    .maxAge(jwtProperties.getRefreshExpirationMs())
-                    .sameSite("Lax")
-                    .build();
-
-            response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
-            response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+            jwtService.putTokensInCookies(response, accessToken, refreshToken);
 
             return ResponseEntity.ok().build();
         } else {
@@ -124,7 +107,7 @@ public class AuthController {
             Long playerId = jwtService.extractPlayerId(refreshToken);
             PlayerDto playerDto = playerService.getPlayerDto(playerId);
 
-            String newAccessToken = jwtService.generateAccessToken(playerDto.id(), playerDto.username());
+            String newAccessToken = jwtService.generateAccessToken(playerDto.id());
             String newRefreshToken = jwtService.generateRefreshToken(playerDto.id());
 
             ResponseCookie accessCookie = ResponseCookie.from(jwtProperties.getAccessCookieName(), newAccessToken)
