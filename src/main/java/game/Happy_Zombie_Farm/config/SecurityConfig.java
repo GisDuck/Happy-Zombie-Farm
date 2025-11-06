@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfFilter;
 
 @Configuration
@@ -25,15 +26,13 @@ public class SecurityConfig {
     private IdempotencyFilter idempotencyFilter;
     @Autowired
     private CsrfDebugFilter csrfDebugFilter;
-    @Autowired
-    private CsrfTokenRepoConf huba;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf
                     .ignoringRequestMatchers("/auth/**")   // логин/refresh/logout можно без CSRF
-                    .csrfTokenRepository(huba.csrfTokenRepository())
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                     .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler()))
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
