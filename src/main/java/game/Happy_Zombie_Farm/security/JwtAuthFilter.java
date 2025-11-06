@@ -59,7 +59,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private boolean isHtmlRequest(HttpServletRequest request) {
         String accept = request.getHeader("Accept");
-        return accept != null && accept.contains("text/html");
+        String uri = request.getRequestURI();
+        return (accept != null && accept.contains("text/html"))
+                || uri.endsWith(".html");
     }
 
     private void authenticateFromAccessToken(String token, HttpServletRequest request) {
