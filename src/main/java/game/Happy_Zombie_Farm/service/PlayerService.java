@@ -108,7 +108,15 @@ public class PlayerService {
             player.setGold(player.getGold() - gold);
             return;
         }
-        throw new ResourcesException("NotEnough gold id=" + player.getId() + "gold=" + gold);
+        throw new ResourcesException(new StringBuilder()
+                .append("NotEnough gold id=")
+                .append(player.getId())
+                .append(" hasGold=")
+                .append(player.getGold())
+                .append(" needGold=")
+                .append(gold)
+                .toString()
+                );
     }
 
     @Transactional

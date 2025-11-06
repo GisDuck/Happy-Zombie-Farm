@@ -110,24 +110,7 @@ public class AuthController {
             String newAccessToken = jwtService.generateAccessToken(playerDto.id());
             String newRefreshToken = jwtService.generateRefreshToken(playerDto.id());
 
-            ResponseCookie accessCookie = ResponseCookie.from(jwtProperties.getAccessCookieName(), newAccessToken)
-                    .httpOnly(true)
-                    .secure(true)
-                    .path("/")
-                    .maxAge(jwtProperties.getAccessExpirationMs())
-                    .sameSite("Lax")
-                    .build();
-
-            ResponseCookie refreshCookie = ResponseCookie.from(jwtProperties.getRefreshCookieName(), newRefreshToken)
-                    .httpOnly(true)
-                    .secure(true)
-                    .path("/auth") // refresh ходит только под /auth/*
-                    .maxAge(jwtProperties.getRefreshExpirationMs())
-                    .sameSite("Lax")
-                    .build();
-
-            response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
-            response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+            jwtService.putTokensInCookies(response, newAccessToken, newRefreshToken);
 
             return ResponseEntity.ok().build();
 
@@ -141,12 +124,7 @@ public class AuthController {
     @PostMapping("/logout")
     @Transactional
     public ResponseEntity<Void> logout(HttpServletResponse response) {
-        ResponseCookie accessCookie = ResponseCookie.from(jwtProperties.getAccessCookieName(), "")
-                .httpOnly(true).secure(true).path("/").maxAge(0).sameSite("Lax").build();
-        ResponseCookie refreshCookie = ResponseCookie.from(jwtProperties.getRefreshCookieName(), "")
-                .httpOnly(true).secure(true).path("/auth").maxAge(0).sameSite("Lax").build();
-        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+        jwtService.putTokensInCookies(response, "", "");
         return ResponseEntity.ok().build();
     }
 
