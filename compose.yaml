@@ -44,6 +44,8 @@ services:
       - '${REDIS_PORT}'
     volumes:
       - redis-data:/data
+    networks:
+      - proxy
 
   app:
     image: openjdk:17
