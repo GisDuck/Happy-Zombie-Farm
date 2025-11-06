@@ -122,14 +122,14 @@ async function onTelegramAuth(user) {
   const params = new URLSearchParams(window.location.search);
   const redirectTo = params.get('redirect');
 
-  const ok = await postAuthRefresh();  // POST /auth/refresh
+  const res = await postAuthRefresh();  // POST /auth/refresh
 
   if (!redirectTo) {
     // обычный заход на страницу
     return;
   }
 
-  if (ok) {
+  if (res.ok) {
     window.location.href = redirectTo; // вернуться на защищённую страницу
   }
 })();
