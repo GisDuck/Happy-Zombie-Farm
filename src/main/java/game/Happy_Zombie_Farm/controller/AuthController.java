@@ -98,7 +98,7 @@ public class AuthController {
 
         try {
             // проверить подпись и что это именно refresh
-            if (!jwtService.isRefreshToken(refreshToken)) {
+            if (!jwtService.isTokenValid(refreshToken) || !jwtService.isRefreshToken(refreshToken)) {
                 return ResponseEntity.status(401).build();
             }
 
