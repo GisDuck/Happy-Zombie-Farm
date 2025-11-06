@@ -6,10 +6,9 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 
 @Configuration
-public class Huba {
+public class CsrfTokenRepoConf {
     @Bean
     public CsrfTokenRepository csrfTokenRepository() {
-        return CookieCsrfTokenRepository.withHttpOnlyFalse(); // дефолт: XSRF-TOKEN + X-XSRF-TOKEN
+        return CookieCsrfTokenRepository.withHttpOnlyFalse();
     }
-
 }

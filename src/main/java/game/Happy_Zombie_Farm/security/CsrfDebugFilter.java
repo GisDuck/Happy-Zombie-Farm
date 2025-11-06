@@ -1,6 +1,6 @@
 package game.Happy_Zombie_Farm.security;
 
-import game.Happy_Zombie_Farm.config.Huba;
+import game.Happy_Zombie_Farm.config.CsrfTokenRepoConf;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -20,7 +19,7 @@ import java.io.IOException;
 public class CsrfDebugFilter extends OncePerRequestFilter {
 
     @Autowired
-    private Huba huba;
+    private CsrfTokenRepoConf huba;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
