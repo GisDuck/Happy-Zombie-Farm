@@ -78,23 +78,51 @@ async function callGraphQL(query, variables, description) {
     }
 }
 
-
-async function tryRefresh() {
+async function postAuthRefresh() {
   const res = await fetch('/auth/refresh', {
     method: 'POST',
     credentials: 'include'
   });
 
-  if (res.ok) return true;
-  return false;
+  return res;
 }
+
+async function postAuthLogout() {
+  const res = await fetch('/auth/logout', {
+    method: 'POST',
+    credentials: 'include'
+  });
+
+  return res;
+}
+
+async function onTelegramAuth(user) {
+        try {
+            const resp = await fetch("/auth/telegram-login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify(user)
+            });
+
+            if (resp.ok) {
+//            Делаем когда логин удачный
+            } else {
+//            Делаем когда с сервера пришел ответ не ок
+            }
+        } catch (e) {
+//        Делаем если вдруг совсем сломалось
+        }
+    }
 
 // Вызывается всегда
 (async () => {
   const params = new URLSearchParams(window.location.search);
   const redirectTo = params.get('redirect');
 
-  const ok = await tryRefresh();  // POST /auth/refresh
+  const ok = await postAuthRefresh();  // POST /auth/refresh
 
   if (!redirectTo) {
     // обычный заход на страницу
