@@ -46,6 +46,46 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         return null;
     }
 
+    private String resolveRefreshToken(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+                if (jwtProperties.getRefreshCookieName().equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean isHtmlRequest(HttpServletRequest request) {
+        String accept = request.getHeader("Accept");
+        return accept != null && accept.contains("text/html");
+    }
+
+    private void authenticateFromAccessToken(String token, HttpServletRequest request) {
+        Claims claims = jwtService.extractAllClaims(token);
+        Long playerId = Long.valueOf(String.valueOf(claims.get("playerId")));
+
+        PlayerPrincipal principal = new PlayerPrincipal(playerId);
+
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(
+                        principal,
+                        null,
+                        principal.getAuthorities()
+                );
+        authToken.setDetails(
+                new WebAuthenticationDetailsSource().buildDetails(request)
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        log.info("JwtAuthFilter: authenticated playerId={} path={} header={} cookies={}",
+                playerId, request.getRequestURI(),
+                request.getHeader("X-XSRF-TOKEN"),
+                request.getCookies());
+    }
+
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -53,32 +93,45 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String token = resolveAccessToken(request);
+        String accessToken = resolveAccessToken(request);
 
-        if (jwtService.isTokenValid(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
-            Claims claims = jwtService.extractAllClaims(token);
-            Long playerId = Long.valueOf(String.valueOf(claims.get("playerId")));
-            String username = (String) claims.get("username");
+        if (accessToken != null
+            && jwtService.isTokenValid(accessToken)
+            && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            PlayerPrincipal principal = new PlayerPrincipal(playerId, username);
-
-            UsernamePasswordAuthenticationToken authToken =
-                    new UsernamePasswordAuthenticationToken(
-                            principal,
-                            null,
-                            principal.getAuthorities()
-                    );
-            authToken.setDetails(
-                new WebAuthenticationDetailsSource()
-                .buildDetails(request)
-            );
-
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-
-            log.info("JwtAuthFilter: authenticated playerId={} path={} header={} cookies={}",
-                    playerId, request.getRequestURI(), request.getHeader("X-XSRF-TOKEN"), request.getCookies());
+            authenticateFromAccessToken(accessToken, request);
+            filterChain.doFilter(request, response);
+            return;
         }
 
+        if (SecurityContextHolder.getContext().getAuthentication() == null
+                && isHtmlRequest(request)) {
+
+            String refreshToken = resolveRefreshToken(request);
+
+            if (refreshToken != null
+                    && jwtService.isTokenValid(refreshToken)
+                    && jwtService.isRefreshToken(refreshToken)) {
+
+                Long playerId = jwtService.extractPlayerId(refreshToken);
+
+                String newAccessToken = jwtService.generateAccessToken(playerId);
+                String newRefreshToken = jwtService.generateRefreshToken(playerId);
+
+                jwtService.putTokensInCookies(response, newAccessToken, newRefreshToken);
+
+                authenticateFromAccessToken(newAccessToken, request);
+
+                log.info("JwtAuthFilter: get new tokens and authorized for playerId={} path={}",
+                        playerId, request.getRequestURI());
+
+                filterChain.doFilter(request, response);
+                return;
+            }
+        }
+
+        // 3. Для API/GraphQL или если refresh невалиден — просто идём дальше.
+        // Security/EntryPoint сам вернёт 401 или редирект на /login.
         filterChain.doFilter(request, response);
     }
 

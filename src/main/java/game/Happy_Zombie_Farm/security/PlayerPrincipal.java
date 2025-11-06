@@ -7,16 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-public class PlayerPrincipal implements UserDetails {
-
-    @Getter
-    private final Long playerId;
-    private final String username;
-
-    public PlayerPrincipal(Long playerId, String username) {
-        this.playerId = playerId;
-        this.username = username;
-    }
+@Getter
+public record PlayerPrincipal(Long playerId) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -30,18 +22,26 @@ public class PlayerPrincipal implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username != null ? username : String.valueOf(playerId);
+        return playerId.toString();
     }
 
     @Override
-    public boolean isAccountNonExpired() { return true; }
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
     @Override
-    public boolean isAccountNonLocked() { return true; }
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
     @Override
-    public boolean isCredentialsNonExpired() { return true; }
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
     @Override
-    public boolean isEnabled() { return true; }
+    public boolean isEnabled() {
+        return true;
+    }
 }
