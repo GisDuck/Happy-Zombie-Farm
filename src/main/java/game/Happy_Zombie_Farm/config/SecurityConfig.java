@@ -1,6 +1,7 @@
 package game.Happy_Zombie_Farm.config;
 
 import game.Happy_Zombie_Farm.idempotency.IdempotencyFilter;
+import game.Happy_Zombie_Farm.security.CsrfDebugFilter;
 import game.Happy_Zombie_Farm.security.JwtAuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -13,15 +14,17 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfFilter;
 
 @Configuration
 public class SecurityConfig {
 
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
-
     @Autowired
     private IdempotencyFilter idempotencyFilter;
+    @Autowired
+    private CsrfDebugFilter csrfDebugFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,6 +41,7 @@ public class SecurityConfig {
                     // всё остальное — только с токеном
                     .anyRequest().authenticated()
             )
+            .addFilterBefore(csrfDebugFilter, CsrfFilter.class)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterAfter(idempotencyFilter, JwtAuthFilter.class);
 
