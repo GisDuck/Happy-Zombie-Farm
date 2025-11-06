@@ -8,7 +8,13 @@ import java.util.Collection;
 import java.util.List;
 
 @Getter
-public record PlayerPrincipal(Long playerId) implements UserDetails {
+public class PlayerPrincipal implements UserDetails {
+
+    private final Long playerId;
+
+    public PlayerPrincipal(Long playerId) {
+        this.playerId = playerId;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -26,22 +32,14 @@ public record PlayerPrincipal(Long playerId) implements UserDetails {
     }
 
     @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+    public boolean isAccountNonExpired() { return true; }
 
     @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+    public boolean isAccountNonLocked() { return true; }
 
     @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+    public boolean isCredentialsNonExpired() { return true; }
 
     @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    public boolean isEnabled() { return true; }
 }
