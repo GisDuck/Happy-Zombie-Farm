@@ -16,13 +16,14 @@ public class IdempotencyService {
 
     private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
-
-    @Value("${REDIS_TTL_MIN:10}")
-    private int redisTilMin;
-
     private final Duration TTL;
 
-    public IdempotencyService(StringRedisTemplate redisTemplate, ObjectMapper objectMapper) {
+
+    public IdempotencyService(
+        StringRedisTemplate redisTemplate,
+        ObjectMapper objectMapper,
+        @Value("${REDIS_TTL_MIN:10}") int redisTilMin
+    ) {
         this.redisTemplate = redisTemplate;
         this.objectMapper = objectMapper;
         TTL = Duration.ofMinutes(redisTilMin);
