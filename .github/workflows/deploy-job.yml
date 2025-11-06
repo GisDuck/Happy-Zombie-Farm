@@ -12,19 +12,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: deploy file and run Docker on remote server
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build JAR
+        run: ./gradlew bootJar
+
+      - name: Copy JAR to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: hzfarm.ru
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "build/libs/*.jar"
+          target: "/root/app"
+
+      - name: run Docker on remote server
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: 'hzfarm.ru'
-          username: 'root'
+          host: hzfarm.ru
+          username: root
           key: ${{ secrets.SSH_PRIVATE_KEY}}
           script: |
             set -e
             cd app
             
             docker compose down app
-            
-            git pull origin master
-            ./gradlew bootJar
             
             docker compose up -d
