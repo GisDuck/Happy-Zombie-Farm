@@ -427,7 +427,8 @@
         const headers = {
             "Content-Type": "application/json",
             "Idempotency-Key": key,
-            "X-XSRF-TOKEN": csrf
+            "X-XSRF-TOKEN": csrf,
+            "X-CSRF-TOKEN": csrf
         };
 
         const body = JSON.stringify({

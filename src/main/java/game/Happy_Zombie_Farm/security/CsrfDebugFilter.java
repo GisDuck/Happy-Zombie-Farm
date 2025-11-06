@@ -6,6 +6,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -14,6 +16,12 @@ import java.io.IOException;
 @Slf4j
 @Component
 public class CsrfDebugFilter extends OncePerRequestFilter {
+
+    private final CsrfTokenRepository repo;
+
+    public CsrfDebugFilter(CsrfTokenRepository repo) {
+        this.repo = repo;
+    }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -26,7 +34,11 @@ public class CsrfDebugFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String header = request.getHeader("X-XSRF-TOKEN");
+        CsrfToken token = repo.loadToken(request);
+        String expected = token != null ? token.getToken() : null;
+        String headerName = token != null ? token.getHeaderName() : "X-XSRF-TOKEN";
+        String headerVal = request.getHeader(headerName);
+
         String cookieVal = null;
         if (request.getCookies() != null) {
             for (Cookie c : request.getCookies()) {
@@ -35,9 +47,9 @@ public class CsrfDebugFilter extends OncePerRequestFilter {
                 }
             }
         }
-        log.info("CSRF debug: {} {} header={} cookie={}",
-                request.getMethod(), request.getRequestURI(),
-                header, cookieVal);
+
+        log.info("CSRF debug2: expected={}, headerName={}, headerVal={}, cookie={}",
+                expected, headerName, headerVal, cookieVal);
 
         filterChain.doFilter(request, response);
     }
