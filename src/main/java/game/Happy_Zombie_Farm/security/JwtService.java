@@ -127,13 +127,17 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token) {
+        if (token == null || token.isBlank()) {
+            return false;
+        }
+
         try {
             Jwts.parser()
                     .verifyWith(getSignKey())
                     .build()
                     .parse(token);
             return true;
-        } catch (JwtException e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
