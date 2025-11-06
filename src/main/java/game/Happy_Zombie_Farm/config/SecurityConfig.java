@@ -3,6 +3,7 @@ package game.Happy_Zombie_Farm.config;
 import game.Happy_Zombie_Farm.idempotency.IdempotencyFilter;
 import game.Happy_Zombie_Farm.security.CsrfDebugFilter;
 import game.Happy_Zombie_Farm.security.JwtAuthFilter;
+import game.Happy_Zombie_Farm.security.SpaCsrfTokenRequestHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,14 +26,15 @@ public class SecurityConfig {
     @Autowired
     private CsrfDebugFilter csrfDebugFilter;
     @Autowired
-    private Huba huba;
+    private CsrfTokenRepoConf huba;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf
                     .ignoringRequestMatchers("/auth/**")   // логин/refresh/logout можно без CSRF
-                    .csrfTokenRepository(huba.csrfTokenRepository()))
+                    .csrfTokenRepository(huba.csrfTokenRepository())
+                    .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler()))
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                     // REST логин можно
