@@ -24,19 +24,11 @@ public class SecurityConfig {
     private IdempotencyFilter idempotencyFilter;
 
     @Bean
-    public CookieCsrfTokenRepository csrfTokenRepository() {
-        CookieCsrfTokenRepository repo = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        repo.setCookieName("XSRF-TOKEN");
-        repo.setHeaderName("X-CSRF-TOKEN");
-        return repo;
-    }
-
-    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf
                     .ignoringRequestMatchers("/auth/**")   // логин/refresh/logout можно без CSRF
-                    .csrfTokenRepository(csrfTokenRepository()))
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                     // REST логин можно

@@ -75,8 +75,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(authToken);
 
-            log.info("JwtAuthFilter: authenticated playerId={} path={}",
-                    playerId, request.getRequestURI());
+            log.info("JwtAuthFilter: authenticated playerId={} path={} request={}",
+                    playerId, request.getRequestURI(), request);
         }
 
         filterChain.doFilter(request, response);
