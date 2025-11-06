@@ -52,7 +52,7 @@ services:
     container_name: app
     restart: unless-stopped
     volumes:
-      - ./hzfarm.jar:/app/hzfarm.jar:ro
+      - ./build/libs/hzfarm.jar:/app/hzfarm.jar:ro
       - ./logs:/logs
     env_file:
       - .env
