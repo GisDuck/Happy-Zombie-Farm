@@ -11,5 +11,5 @@ public interface HouseRepository extends JpaRepository<House, Long> {
 
     List<House> findByPlayerIdAndType(Long playerId, HouseType type);
 
-    boolean existsByPlayerIdAndCell(Long playerId, Integer cell);
+    boolean existsByPlayer_IdAndCell(Long playerId, Integer cell);
 }

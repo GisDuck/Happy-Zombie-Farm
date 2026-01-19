@@ -211,7 +211,7 @@ public class HouseService {
     }
 
     public boolean isCellFull(Long playerId, Integer cell) {
-        return houseRepository.existsByPlayerIdAndCell(playerId, cell);
+        return houseRepository.existsByPlayer_IdAndCell(playerId, cell);
     }
 }
 
