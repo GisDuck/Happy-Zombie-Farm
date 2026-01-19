@@ -10,11 +10,12 @@ spring:
     import: optional:file:.env[.properties]
 
   graphql:
+    path: /api/graphql
     schema:
       locations: classpath:graphql/
     graphiql:
       enabled: true
-      path: /api/graphiql
+      path: /api/graphql
 
   profiles:
     default: houses-info, game-logic, security
