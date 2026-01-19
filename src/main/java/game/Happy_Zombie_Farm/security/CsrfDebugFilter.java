@@ -18,7 +18,7 @@ public class CsrfDebugFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return !"/graphql".equals(request.getRequestURI());
+        return !"/api/graphql".equals(request.getRequestURI());
     }
 
     @Override

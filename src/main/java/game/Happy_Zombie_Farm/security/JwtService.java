@@ -79,7 +79,7 @@ public class JwtService {
         ResponseCookie refreshCookie = ResponseCookie.from(jwtProperties.getRefreshCookieName(), refreshToken)
                 .httpOnly(true)
                 .secure(true)
-                .path("/auth") // refresh ходит только под /auth/*
+                .path("/api/auth") // refresh ходит только под /api/auth/*
                 .maxAge(jwtProperties.getRefreshExpirationMs())
                 .sameSite("Lax")
                 .build();

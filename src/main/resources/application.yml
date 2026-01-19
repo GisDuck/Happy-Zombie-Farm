@@ -1,6 +1,4 @@
 server:
-  servlet:
-    context-path: /api
   port: 8080
   address: 0.0.0.0
 
@@ -16,7 +14,7 @@ spring:
       locations: classpath:graphql/
     graphiql:
       enabled: true
-      path: /graphiql
+      path: /api/graphiql
 
   profiles:
     default: houses-info, game-logic, security
