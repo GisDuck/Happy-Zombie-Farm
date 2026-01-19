@@ -161,11 +161,11 @@
         const btnLogout = document.getElementById("btn-logout");
 
         btnRefresh.addEventListener("click", function () {
-            callAuth("/auth/refresh");
+            callAuth("/api/auth/refresh");
         });
 
         btnLogout.addEventListener("click", function () {
-            callAuth("/auth/logout");
+            callAuth("/api/auth/logout");
         });
     });
 </script>

@@ -43,7 +43,7 @@ async function callGraphQL(query, variables, description) {
     };
 
     try {
-        const resp = await fetch("/graphql", {
+        const resp = await fetch("/api/graphql", {
             method: "POST",
             headers: headers,
             credentials: "include",
@@ -79,7 +79,7 @@ async function callGraphQL(query, variables, description) {
 }
 
 async function postAuthRefresh() {
-  const res = await fetch('/auth/refresh', {
+  const res = await fetch('/api/auth/refresh', {
     method: 'POST',
     credentials: 'include'
   });
@@ -88,7 +88,7 @@ async function postAuthRefresh() {
 }
 
 async function postAuthLogout() {
-  const res = await fetch('/auth/logout', {
+  const res = await fetch('/api/auth/logout', {
     method: 'POST',
     credentials: 'include'
   });
@@ -98,7 +98,7 @@ async function postAuthLogout() {
 
 async function onTelegramAuth(user) {
         try {
-            const resp = await fetch("/auth/telegram-login", {
+            const resp = await fetch("/api/auth/telegram-login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

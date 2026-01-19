@@ -69,10 +69,32 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.docker.network=proxy'
-      - 'traefik.http.routers.app.rule=Host(`${BASE_URL}`)'
+      - 'traefik.http.routers.app.rule=Host(`${BASE_URL}`) && PathPrefix(/api)'
       - 'traefik.http.routers.app.entrypoints=websecure'
       - 'traefik.http.routers.app.tls.certresolver=le'
+      - "traefik.http.routers.app.priority=100"
       - 'traefik.http.services.app.loadbalancer.server.port=8080'
+
+  front:
+    build:
+      context: .
+      dockerfile: static-server/Dockerfile
+    container_name: front
+    restart: unless-stopped
+    networks:
+      - proxy
+    environment:
+      - PORT=3000
+      - PUBLIC_DIR=/app/public
+      # - SPA_FALLBACK=true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.static.rule=Host(`${BASE_URL}`) && PathPrefix(`/`) && !PathPrefix(`/api`)"
+      - "traefik.http.routers.static.entrypoints=websecure"
+      - "traefik.http.routers.static.tls.certresolver=le"
+      - "traefik.http.routers.static.priority=10"
+      - "traefik.http.services.static.loadbalancer.server.port=3000"
 
 
   traefik:
