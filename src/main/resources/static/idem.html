@@ -237,14 +237,8 @@
                 <div class="row">
                     <div>
                         <label>
-                            locationX (Int)
-                            <input type="number" id="build-x" value="0" />
-                        </label>
-                    </div>
-                    <div>
-                        <label>
-                            locationY (Int)
-                            <input type="number" id="build-y" value="0" />
+                            cell (Int)
+                            <input type="number" id="build-cell" value="0" />
                         </label>
                     </div>
                 </div>
@@ -291,14 +285,8 @@
                 <div class="row">
                     <div>
                         <label>
-                            newLocationX (Int)
-                            <input type="number" id="input-new-x" value="0" />
-                        </label>
-                    </div>
-                    <div>
-                        <label>
-                            newLocationY (Int)
-                            <input type="number" id="input-new-y" value="0" />
+                            newCell (Int)
+                            <input type="number" id="input-new-cell" value="0" />
                         </label>
                     </div>
                 </div>
@@ -419,7 +407,7 @@
             housesCache.forEach(h => {
                 const opt = document.createElement("option");
                 opt.value = h.id;
-                opt.textContent = "#" + h.id + " • " + h.type + " • lvl " + h.level + " • (" + h.locationX + "," + h.locationY + ")";
+                opt.textContent = "#" + h.id + " • " + h.type + " • lvl " + h.level + " • (" + h.cell + ")";
                 select.appendChild(opt);
             });
 
@@ -459,8 +447,7 @@
     type
     level
     skin
-    locationX
-    locationY
+    cell
   }
 }`;
         const res = await callGraphQL(query, {}, "getPlayerHouses");
@@ -490,8 +477,7 @@
     type
     level
     skin
-    locationX
-    locationY
+    cell
   }
 }`;
         const res = await callGraphQL(query, vars, "getHouse");
@@ -517,15 +503,13 @@
     async function doBuildHouse() {
         const type = document.getElementById("build-type").value;
         const skin = document.getElementById("build-skin").value || "default";
-        const x = parseInt(document.getElementById("build-x").value, 10) || 0;
-        const y = parseInt(document.getElementById("build-y").value, 10) || 0;
+        const cell = parseInt(document.getElementById("build-cell").value, 10) || 0;
 
         const vars = {
             input: {
                 type: type,
                 skin: skin,
-                locationX: x,
-                locationY: y
+                cell: cell
             }
         };
 
@@ -535,8 +519,7 @@
     type
     level
     skin
-    locationX
-    locationY
+    cell
   }
 }`;
         const res = await callGraphQL(query, vars, "buildHouse");
@@ -563,8 +546,7 @@
     level
     type
     skin
-    locationX
-    locationY
+    cell
   }
 }`;
         const res = await callGraphQL(query, vars, "updateHouseLevel");
@@ -598,8 +580,7 @@
     type
     level
     skin
-    locationX
-    locationY
+    cell
   }
 }`;
         const res = await callGraphQL(query, vars, "updateHouseSkin");
@@ -610,8 +591,7 @@
     async function doUpdateHouseLocation() {
         const select = document.getElementById("select-update-location");
         const houseId = select.value;
-        const newX = parseInt(document.getElementById("input-new-x").value, 10);
-        const newY = parseInt(document.getElementById("input-new-y").value, 10);
+        const newCell = parseInt(document.getElementById("input-new-cell").value, 10);
 
         if (!houseId) {
             alert("Сначала выбери дом");
@@ -625,8 +605,7 @@
         const vars = {
             input: {
                 houseId: houseId,
-                newLocationX: newX,
-                newLocationY: newY
+                newCell: newCell
             }
         };
 
@@ -636,8 +615,7 @@
     type
     level
     skin
-    locationX
-    locationY
+    cell
   }
 }`;
         const res = await callGraphQL(query, vars, "updateHouseLocation");
