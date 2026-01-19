@@ -9,6 +9,6 @@ databaseChangeLog:
               - column:
                   name: cell
                   type: int
-                  defaultValue: ''
+                  defaultValue: -1
                   constraints:
                     nullable: false
