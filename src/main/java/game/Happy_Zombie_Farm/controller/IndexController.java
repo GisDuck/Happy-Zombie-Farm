@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class IndexController {
 
     // корень сайта и /index → индекс
-    @GetMapping({"/", "/index"})
+    @GetMapping({"/api/", "/api/index"})
     public String index() {
         return "forward:/index.html";
     }
