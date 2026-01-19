@@ -7,7 +7,11 @@ spring:
     name: Happy-Zombie-Farm
 
   config:
-    import: optional:file:.env[.properties]
+    import:
+      - optional:file:.env[.properties]
+      - classpath:application-security.yml
+      - classpath:application-game-logic.yml
+      - classpath:application-houses-info.yml
 
   graphql:
     path: /api/graphql
