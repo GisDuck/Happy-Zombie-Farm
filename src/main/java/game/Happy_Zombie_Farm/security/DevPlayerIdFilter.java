@@ -32,7 +32,8 @@ public class DevPlayerIdFilter extends OncePerRequestFilter {
         String hdr = req.getHeader("PLAYER-ID");
         long playerId = (hdr != null && !hdr.isBlank()) ? Long.parseLong(hdr) : defaultPlayerId;
 
-        var auth = new UsernamePasswordAuthenticationToken(playerId, null, List.of());
+        var principal = new PlayerPrincipal(playerId);
+        var auth = new UsernamePasswordAuthenticationToken(principal, null, List.of());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         chain.doFilter(req, res);
