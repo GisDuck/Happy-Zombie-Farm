@@ -29,7 +29,7 @@ public class DevPlayerIdFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         // Можно переопределять с фронта: X-Player-Id: 123
-        String hdr = req.getHeader("X-Player-Id");
+        String hdr = req.getHeader("PLAYER-ID");
         long playerId = (hdr != null && !hdr.isBlank()) ? Long.parseLong(hdr) : defaultPlayerId;
 
         var auth = new UsernamePasswordAuthenticationToken(playerId, null, List.of());
