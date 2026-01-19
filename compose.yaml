@@ -58,6 +58,8 @@ services:
       - .env
     environment:
       - SERVER_FORWARD_HEADERS_STRATEGY=native
+      - SPRING_PROFILES_ACTIVE=dev
+      - APP_DEV_PLAYER_ID=1
     command: [ "java", "-jar", "/app/hzfarm.jar" ]
     depends_on:
       - postgres
