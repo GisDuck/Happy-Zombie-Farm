@@ -6,6 +6,5 @@ import game.Happy_Zombie_Farm.enums.HouseType;
 public record BuildHouseInputDto(
         HouseType type,
         String skin,
-        Integer locationX,
-        Integer locationY
+        Integer cell
 ) {}

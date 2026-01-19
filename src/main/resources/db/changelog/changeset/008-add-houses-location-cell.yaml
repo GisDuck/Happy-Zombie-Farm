@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008-add-houses-location-cell
+      author: GisDuck
+      changes:
+        - addColumn:
+            tableName: houses
+            columns:
+              - column:
+                  name: cell
+                  type: int
+                  defaultValue: ''
+                  constraints:
+                    nullable: false

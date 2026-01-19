@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 009-del-houses-location-XY
+      author: GisDuck
+      changes:
+        - dropColumn:
+            schemaName: public
+            tableName: houses
+            columnName: location_x
+        - dropColumn:
+            schemaName: public
+            tableName: houses
+            columnName: location_y

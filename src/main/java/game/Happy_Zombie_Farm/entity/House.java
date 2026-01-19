@@ -31,11 +31,8 @@ public class House {
     @Column(nullable = false)
     private Integer level;
 
-    @Column(name = "location_x", nullable = false)
-    private Integer locationX;
-
-    @Column(name = "location_y", nullable = false)
-    private Integer locationY;
+    @Column(nullable = false)
+    private Integer cell;
 
     @Column(nullable = false)
     private String skin;

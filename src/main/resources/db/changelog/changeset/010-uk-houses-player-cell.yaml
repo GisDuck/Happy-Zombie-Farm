@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 010-uk-houses-player-cell
+      author: GisDuck
+      changes:
+        - addUniqueConstraint:
+            schemaName: public
+            tableName: houses
+            columnNames: player_id, cell
+            constraintName: uk_houses_player_cell

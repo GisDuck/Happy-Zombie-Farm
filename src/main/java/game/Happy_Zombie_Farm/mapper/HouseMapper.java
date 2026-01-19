@@ -12,7 +12,6 @@ public interface HouseMapper {
     @Mapping(target = "playerId", source = "player.id")
     HouseDto toDto(House entity);
 
-    // если нужно из dto в entity (редко надо)
     @InheritInverseConfiguration
     @Mapping(target = "player", ignore = true)
     House toEntity(HouseDto dto);

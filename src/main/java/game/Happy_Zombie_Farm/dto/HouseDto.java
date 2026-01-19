@@ -8,6 +8,5 @@ public record HouseDto(
         HouseType type,
         Integer level,
         String skin,
-        Integer locationX,
-        Integer locationY
+        Integer cell
 ) {}

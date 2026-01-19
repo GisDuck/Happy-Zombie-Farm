@@ -27,7 +27,7 @@ public class CsrfDebugFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        String header = request.getHeader("X-XSRF-TOKEN"); // или X-CSRF-TOKEN, что используешь
+        String header = request.getHeader("X-XSRF-TOKEN");
         String cookieVal = null;
         if (request.getCookies() != null) {
             for (Cookie c : request.getCookies()) {

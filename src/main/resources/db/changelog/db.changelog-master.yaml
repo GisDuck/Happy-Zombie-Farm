@@ -13,3 +13,9 @@ databaseChangeLog:
       file: db/changelog/changeset/006-add-player-last-meat-update.yaml
   - include:
       file: db/changelog/changeset/007-add-player-photo-url.yaml
+  - include:
+      file: db/changelog/changeset/008-add-houses-location-cell.yaml
+  - include:
+      file: db/changelog/changeset/009-del-houses-location-XY.yaml
+  - include:
+      file: db/changelog/changeset/010-uk-houses-player-cell.yaml

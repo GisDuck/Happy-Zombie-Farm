@@ -10,4 +10,6 @@ public interface HouseRepository extends JpaRepository<House, Long> {
     List<House> findByPlayerId(Long playerId);
 
     List<House> findByPlayerIdAndType(Long playerId, HouseType type);
+
+    boolean existsByPlayerIdAndCell(Long playerId, Integer cell);
 }

@@ -7,10 +7,7 @@ import game.Happy_Zombie_Farm.dto.outputDto.RemoveHousePayloadDto;
 import game.Happy_Zombie_Farm.dto.HouseDto;
 import game.Happy_Zombie_Farm.entity.House;
 import game.Happy_Zombie_Farm.entity.Player;
-import game.Happy_Zombie_Farm.exception.NoHouseException;
-import game.Happy_Zombie_Farm.exception.NoPlayerException;
-import game.Happy_Zombie_Farm.exception.NotThisPlayerHouseIdException;
-import game.Happy_Zombie_Farm.exception.WrongSkinHouseParamException;
+import game.Happy_Zombie_Farm.exception.*;
 import game.Happy_Zombie_Farm.mapper.HouseMapper;
 import game.Happy_Zombie_Farm.repository.HouseRepository;
 import game.Happy_Zombie_Farm.repository.PlayerRepository;
@@ -72,6 +69,10 @@ public class HouseService {
             throw new WrongSkinHouseParamException(input.type().name(), input.skin());
         }
 
+        if (isCellFull(playerId, input.cell())) {
+            throw new CellAlreadyFullException(playerId, input.cell());
+        }
+
         Long gold = skinCfg.price();
 
         playerService.takeMoney(gold, player);
@@ -81,8 +82,7 @@ public class HouseService {
         house.setType(input.type());
         house.setLevel(0);
         house.setSkin(input.skin());
-        house.setLocationX(input.locationX());
-        house.setLocationY(input.locationY());
+        house.setCell(input.cell());
 
         house = houseRepository.save(house);
         return houseMapper.toDto(house);
@@ -167,8 +167,11 @@ public class HouseService {
             throw new NotThisPlayerHouseIdException(input.houseId());
         }
 
-        house.setLocationX(input.newLocationX());
-        house.setLocationY(input.newLocationY());
+        if (isCellFull(playerId, input.newCell())) {
+            throw new CellAlreadyFullException(playerId, input.newCell());
+        }
+
+        house.setCell(input.newCell());
         house = houseRepository.save(house);
         return houseMapper.toDto(house);
     }
@@ -205,6 +208,10 @@ public class HouseService {
         playerService.returnMoney(gold, player);
         houseRepository.deleteById(input.houseId());
         return new RemoveHousePayloadDto(true, input.houseId());
+    }
+
+    public boolean isCellFull(Long playerId, Integer cell) {
+        return houseRepository.existsByPlayerIdAndCell(playerId, cell);
     }
 }
 

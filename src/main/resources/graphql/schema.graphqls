@@ -71,12 +71,11 @@ type Player {
 
 type House {
   id: ID!
-  telegramId: Long!
+  playerId: Long!
   type: HouseType!
   level: Int!
   skin: String!
-  locationX: Int!
-  locationY: Int!
+  cell: Int!
 }
 
 enum BoardColor {
