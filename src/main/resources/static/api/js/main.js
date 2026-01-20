@@ -133,3 +133,8 @@ async function onTelegramAuth(user) {
     window.location.href = redirectTo; // вернуться на защищённую страницу
   }
 })();
+
+await fetch('/api/auth/gen-csrf', {
+    method: 'GET',
+    credentials: 'include'
+  });

@@ -101,7 +101,7 @@ public class TelegramAuthService {
         player.setPhotoUrl(telegramAuthDto.photoUrl());
         player.setBoardColor(getRandomBoardColor());
         player.setMeat(0L);
-        player.setGold(0L);
+        player.setGold(60L);
         player.setBrain(0L);
         player.setLastMeatUpdate(now);
         player = playerRepository.save(player);
