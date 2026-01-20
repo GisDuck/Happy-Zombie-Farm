@@ -1,3 +1,8 @@
+fetch('/api/auth/gen-csrf', {
+    method: 'GET',
+    credentials: 'include'
+  });
+
 function getCookie(name) {
         const cookies = document.cookie ? document.cookie.split("; ") : [];
         for (const cookie of cookies) {
@@ -133,8 +138,3 @@ async function onTelegramAuth(user) {
     window.location.href = redirectTo; // вернуться на защищённую страницу
   }
 })();
-
-await fetch('/api/auth/gen-csrf', {
-    method: 'GET',
-    credentials: 'include'
-  });
