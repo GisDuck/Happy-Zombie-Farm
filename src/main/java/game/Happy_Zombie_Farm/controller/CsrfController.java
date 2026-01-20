@@ -29,6 +29,6 @@ public class CsrfController {
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, csrfCookie.toString());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build(); // 204
     }
 }
