@@ -78,17 +78,22 @@ services:
       - 'traefik.http.services.app.loadbalancer.server.port=8080'
 
   front:
-    build:
-      context: .
-      dockerfile: static-server/Dockerfile
+    image: node:20-alpine
     container_name: front
     restart: unless-stopped
     networks:
       - proxy
-    environment:
-      - PORT=3000
-      - PUBLIC_DIR=/app/public
-      # - SPA_FALLBACK=true
+    volumes:
+      - ./front/:/front
+      - front_node_modules:/front/node_modules
+    working_dir: /front
+    command: >
+      sh -lc "
+        npm ci &&
+        npm run dev -- --host 0.0.0.0 --port 5173
+      "
+    ports:
+      - "5173:5173"
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
@@ -96,7 +101,8 @@ services:
       - "traefik.http.routers.static.entrypoints=websecure"
       - "traefik.http.routers.static.tls.certresolver=le"
       - "traefik.http.routers.static.priority=10"
-      - "traefik.http.services.static.loadbalancer.server.port=3000"
+      - "traefik.http.services.static.loadbalancer.server.port=5173"
+
 
 
   traefik:
@@ -149,3 +155,4 @@ services:
 
 volumes:
   redis-data:
+  front_node_modules:
