@@ -22,6 +22,7 @@ import java.time.Instant;
 import java.util.List;
 
 import static graphql.com.google.common.primitives.Longs.max;
+import static java.lang.Long.min;
 
 @Service
 public class PlayerService {
@@ -39,6 +40,7 @@ public class PlayerService {
     public PlayerDto getPlayerDto(Long playerId) {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new NoPlayerException(playerId));
+        updatePlayerMeat(player);
         return playerMapper.toDto(player);
     }
 
@@ -90,7 +92,7 @@ public class PlayerService {
         long allPlayerMeat = player.getMeat() + meatToAdd;
 
 
-        player.setMeat(max(maxMeatStorage, allPlayerMeat));
+        player.setMeat(min(maxMeatStorage, allPlayerMeat));
 
         // обновляем время последнего перерасчёта
         player.setLastMeatUpdate(now);
